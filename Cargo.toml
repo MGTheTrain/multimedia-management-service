@@ -1,0 +1,20 @@
+[package]
+name = "main"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+models = { path = "lib/domain/models" }
+interfaces = { path = "lib/domain/interfaces" }
+controllers = { path = "lib/web/controllers" }
+dtos = { path = "lib/web/dtos" }
+services = { path = "lib/application/services" }
+connectors = { path = "lib/infrastructure/connectors" }
+settings = { path = "lib/infrastructure/settings" }
+data_access = { path = "lib/persistence/data_access" }
+migrations = { path = "lib/persistence/migrations" }
+
+
+
+serde = { version = "1.0.171", features = ["derive"] }
+serde_json = "1.0.103"
