@@ -7,7 +7,7 @@
 
 ### Summary
 
-The Mutli Media Management Service enables a shared video platform and use cases like live streaming static (e.g. Youtube, Netflix) or dynamic time-series (e.g. video, audio, subtitles) content (e.g. Twitch, Kick). The platform is exposing HTTP endpoints in which to
+The Mutli Media Management Service enables a shared multi-media platform and use cases like live streaming static (e.g. Youtube, Netflix) or dynamic time-series (e.g. video, audio, subtitles) content (e.g. Twitch, Kick). The platform is exposing HTTP endpoints in which to
 
 - upload multimedia container file formats containing video, audio or subtitles (e.g. MP4, MOV, WEBM) to a Storage Account Container (consider tags, name of the video, description) and generate meta information for the uploaded multimedia container file in a Sql database table
 - download multimedia container file formats by id from a Storage Account Container
