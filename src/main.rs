@@ -1,12 +1,12 @@
-extern crate models;
-extern crate interfaces;
-extern crate controllers;
-extern crate dtos;
-extern crate services;
 extern crate connectors;
-extern crate settings;
+extern crate controllers;
 extern crate data_access;
+extern crate dtos;
+extern crate interfaces;
 extern crate migrations;
+extern crate models;
+extern crate services;
+extern crate settings;
 
 fn main() {
     models::hello();

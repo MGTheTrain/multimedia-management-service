@@ -1,5 +1,5 @@
-use crate::model::Model;
 use crate::enums::FileMetaType;
+use crate::model::Model;
 
 pub struct FileMeta {
     pub id: i32,
@@ -10,11 +10,11 @@ pub struct FileMeta {
 
 impl Model for FileMeta {
     fn new() -> Self {
-        FileMeta { 
+        FileMeta {
             id: -1,
             name: String::from(""),
             file_type: FileMetaType::Invalid,
-            file_size_in_kb: 0
+            file_size_in_kb: 0,
         }
     }
 }
@@ -26,7 +26,7 @@ mod tests {
     #[test]
     fn test_file_meta() {
         // FileMeta::new() when wanting to create a file meta object trough its constructor on the stack memory
-        let video_file_meta = Box::new(FileMeta{
+        let video_file_meta = Box::new(FileMeta {
             id: 1,
             name: String::from("simple_video.h264"),
             file_type: FileMetaType::Video,
@@ -37,7 +37,7 @@ mod tests {
         assert_eq!(video_file_meta.file_type, FileMetaType::Video);
         assert_eq!(video_file_meta.file_size_in_kb, 200000);
 
-        let audio_file_meta = Box::new(FileMeta{
+        let audio_file_meta = Box::new(FileMeta {
             id: 2,
             name: String::from("simple_audio.aac"),
             file_type: FileMetaType::Audio,

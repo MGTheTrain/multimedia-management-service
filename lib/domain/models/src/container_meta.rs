@@ -1,6 +1,6 @@
-use crate::model::Model;
-use crate::file_meta::FileMeta;
 use crate::enums::FileMetaType;
+use crate::file_meta::FileMeta;
+use crate::model::Model;
 
 extern crate chrono;
 
@@ -18,7 +18,7 @@ pub struct ContainerMeta {
 
 impl Model for ContainerMeta {
     fn new() -> Self {
-        ContainerMeta { 
+        ContainerMeta {
             id: -1,
             date_time_created: Utc::now(),
             date_time_updated: Utc::now(),
@@ -47,10 +47,10 @@ mod tests {
         audio_file_meta.name = String::from("simple_audio.aac");
         audio_file_meta.file_type = FileMetaType::Audio;
         audio_file_meta.file_size_in_kb = 150000;
-        
+
         // --
         let current_date_time = Utc::now();
-        let tags: Vec<String> =  vec![String::from("entertainment"), String::from("music")];
+        let tags: Vec<String> = vec![String::from("entertainment"), String::from("music")];
         let file_meta_ids: Vec<i32> = vec![video_file_meta.id, audio_file_meta.id];
 
         let mut container_meta = ContainerMeta::new();

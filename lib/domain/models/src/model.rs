@@ -1,3 +1,3 @@
 pub trait Model {
-    fn new() -> Self; 
+    fn new() -> Self;
 }
