@@ -9,6 +9,8 @@ edition = "2021"
 azure_core = "0.16.0"
 azure_storage = "0.16.0"
 azure_storage_blobs = "0.16.0"
+aws-config = "0.56.1"
+aws-sdk-s3 = "0.31.2"
 futures = "0.3"
 tokio = { version = "1", features = ["full"] }
 bytes = "1.0"

@@ -35,7 +35,7 @@ impl AzureBlobStorageAccountConnector {
 
     /// Async method for uploading blobs to an Azure Storage Account Container
     ///
-    /// This method takes &self, the blob_name and an file_path,
+    /// This method takes &self, the blob_name and a file_path as parameters,
     /// and returns an Result<(), Error> object
     async fn upload_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
@@ -51,7 +51,7 @@ impl AzureBlobStorageAccountConnector {
 
     /// Async method for retrieving the content of a blob from an Azure Storage Account Container
     ///
-    /// This method takes &self and the blob_name,
+    /// This method takes &self and the blob_name as parameters,
     /// and returns an Result<Vec<u8>, Error> object
     async fn retrieve_bytes(&self, blob_name: &str) -> Result<Vec<u8>, Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
@@ -61,7 +61,7 @@ impl AzureBlobStorageAccountConnector {
 
     /// Async method for downloading blobs from an Azure Storage Account Container
     ///
-    /// This method takes &self, the blob_name and an file_path,
+    /// This method takes &self, the blob_name and a file_path as parameters,
     /// and returns an Result<(), Error> object
     async fn download_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
         let data = self.retrieve_bytes(blob_name).await?;
@@ -78,7 +78,7 @@ impl AzureBlobStorageAccountConnector {
 
     /// Async method for deleting blobs from an Azure Storage Account Container
     ///
-    /// This method takes &self, the blob_name,
+    /// This method takes &self and the blob_name as parameters,
     /// and returns an Result<(), Error> object
     async fn delete_blob(&self, blob_name: &str) -> Result<(), Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
@@ -97,7 +97,7 @@ mod tests {
     async fn test_azure_storage_account_container_connector_methods() -> azure_core::Result<()> {
         env_logger::init();
 
-        let env_file_path = "./assets/azure-secrets.dev.cfg";
+        let env_file_path = "./assets/az-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
 
         let azure_access_key = std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY not found in .cfg");
