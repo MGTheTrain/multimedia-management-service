@@ -1,0 +1,1 @@
+This is a sample file considering Rust with azure_storage_blobs crate
