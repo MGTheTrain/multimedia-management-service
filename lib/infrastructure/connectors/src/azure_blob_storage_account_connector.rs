@@ -1,8 +1,9 @@
 use std::{io::{BufReader, Read, Write}, fs::{File, self}};
 
-use azure_core::Error;
+use azure_core::{Error};
 use azure_storage::prelude::*;
 use azure_storage_blobs::prelude::*;
+use bytes::Bytes;
 use log::{info};
 pub struct AzureBlobStorageAccountConnector {
     container_client: Option<ContainerClient>,
@@ -46,6 +47,7 @@ impl AzureBlobStorageAccountConnector {
         info!("Successfully uploaded blob {}", blob_name);
         Ok(())
     }
+
 
     /// Async method for retrieving the content of a blob from an Azure Storage Account Container
     ///
