@@ -109,11 +109,14 @@ mod tests {
                 azure_account_name.as_str(), azure_access_key.as_str(), azure_container_name.as_str()));  
         
         let upload_file_path = "./assets/sample.txt";
-        let download_file_path = "./temp/copy-sample.txt";
+        let download_file_path = "./temp/sample-azure-copy.txt";
         let blob_name = "sample.txt";
-        assert_eq!(azure_blob_storage_account_connector.upload_blob(blob_name, upload_file_path).await?, ());
-        assert_eq!(azure_blob_storage_account_connector.download_blob(blob_name, download_file_path).await?, ());
-        assert_eq!(azure_blob_storage_account_connector.delete_blob(blob_name).await?, ());
+        let upload_blob_result = azure_blob_storage_account_connector.upload_blob(blob_name, upload_file_path).await;
+        assert!(upload_blob_result.is_ok());
+        let download_blob_result = azure_blob_storage_account_connector.download_blob(blob_name, download_file_path).await;
+        assert!(download_blob_result.is_ok());
+        let delete_blob_result = azure_blob_storage_account_connector.delete_blob(blob_name).await;
+        assert!(delete_blob_result, ());
         Ok(())
     }
 }
