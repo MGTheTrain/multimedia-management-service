@@ -74,6 +74,7 @@ impl AwsS3BucketConnector {
             .open(file_path)?;
 
         file.write_all(&bytes)?;
+        info!("Successfully created file {}", file_path);
         Ok(())
     }
 
@@ -120,9 +121,10 @@ mod tests {
         assert!(get_object_output.is_ok());
         let bytes = get_object_output?.body.collect().await.unwrap().into_bytes();
         assert!(bytes.len() > 0);
-        let write_bytes_to_file_result: Result<(), io::Error> = aws_s3_bucket_connector.write_bytes_to_file(&bytes, download_file_path).await;
-        // assert_eq!(write_bytes_to_file_result, ());
-        // assert_eq!(aws_s3_bucket_connector.delete_blob(blob_name).await?, ());
+        let write_bytes_to_file_result = aws_s3_bucket_connector.write_bytes_to_file(&bytes, download_file_path).await;
+        assert!(write_bytes_to_file_result.is_ok());
+        let delete_blob_result = aws_s3_bucket_connector.delete_blob(bucket_name, key).await;
+        assert!(delete_blob_result.is_ok());
         Ok(())
     }
 }
