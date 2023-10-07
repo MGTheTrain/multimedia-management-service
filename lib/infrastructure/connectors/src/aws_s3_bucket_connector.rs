@@ -1,5 +1,5 @@
 use aws_sdk_s3::{Client, Error, operation::{create_bucket::{CreateBucketOutput, CreateBucketError}, put_object::{PutObjectOutput, PutObjectError}, get_object::{GetObjectOutput, GetObjectError}}, error::SdkError, types::{BucketLocationConstraint, CreateBucketConfiguration}, primitives::ByteStream};
-use std::{io::{Write, self}, env, path::Path}; // bring trait into scope
+use std::{io::{Write, self}, env, path::Path}; 
 use std::fs;
 use bytes::Bytes;
 
@@ -119,7 +119,7 @@ mod tests {
         assert!(upload_blob_result.is_ok());
         let get_object_output = aws_s3_bucket_connector.get_object(bucket_name, key).await;
         assert!(get_object_output.is_ok());
-        let bytes = get_object_output?.body.collect().await.unwrap().into_bytes();
+        let bytes = get_object_output?.body.collect().await.unwrap().into_bytes(); // retrieve bytes
         assert!(bytes.len() > 0);
         let write_bytes_to_file_result = aws_s3_bucket_connector.write_bytes_to_file(&bytes, download_file_path).await;
         assert!(write_bytes_to_file_result.is_ok());

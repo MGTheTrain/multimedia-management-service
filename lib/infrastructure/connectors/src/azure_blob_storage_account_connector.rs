@@ -116,7 +116,7 @@ mod tests {
         let download_blob_result = azure_blob_storage_account_connector.download_blob(blob_name, download_file_path).await;
         assert!(download_blob_result.is_ok());
         let delete_blob_result = azure_blob_storage_account_connector.delete_blob(blob_name).await;
-        assert!(delete_blob_result, ());
+        assert!(delete_blob_result.is_ok());
         Ok(())
     }
 }
