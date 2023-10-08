@@ -9,3 +9,4 @@ edition = "2021"
 chrono = "0.4"
 diesel = { version = "2.1.2", features = ["postgres", "chrono"] }
 dotenv = "0.15.0"
+uuid = { version = "1.4.1", features = [ "v4", "fast-rng", "macro-diagnostics"]}

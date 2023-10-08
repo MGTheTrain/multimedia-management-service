@@ -1,5 +1,6 @@
 use crate::schema::file_meta;
 use diesel::prelude::*;
+use uuid::Uuid;
 
 use crate::enums::FileMetaType;
 use crate::model::Model;
@@ -8,7 +9,8 @@ use crate::model::Model;
 #[diesel(table_name = file_meta)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct FileMeta {
-    pub id: i32,
+    pub id: Uuid,
+    pub container_id: Uuid,
     pub name: String,
     pub file_type: i32, /// utilize FileMetaType enum for file_type
     pub file_size_in_kb: i64,
@@ -18,6 +20,7 @@ impl Model for FileMeta {
     fn new() -> Self {
         FileMeta {
             id: -1,
+            container_id: -1,
             name: String::from(""),
             file_type: 0, 
             file_size_in_kb: 0,
@@ -34,7 +37,8 @@ mod tests {
         // FileMeta::new() when wanting to create a file meta object trough its constructor on the stack memory
         let mut file_meta_type = FileMetaType::Video;
         let video_file_meta = Box::new(FileMeta {
-            id: 1,
+            id: Uuid::new_v4(),
+            container_id: Uuid::new_v4(),
             name: String::from("simple_video.h264"),
             file_type: file_meta_type.to_i32(),
             file_size_in_kb: 200000,
@@ -46,7 +50,8 @@ mod tests {
 
         file_meta_type = FileMetaType::Audio;
         let audio_file_meta = Box::new(FileMeta {
-            id: 2,
+            id: Uuid::new_v4(),
+            container_id: Uuid::new_v4(),
             name: String::from("simple_audio.aac"),
             file_type: file_meta_type.to_i32(),
             file_size_in_kb: 150000,

@@ -13,7 +13,7 @@ The Mutli Media Management Service enables a shared multi-media platform and use
 - download multimedia container file formats by id from a Storage Account Container
 - retrieve list of meta information with or without query (query options: by date time, tags, name of the video, free-text search of the description)
 - retrieve meta information by id from a Sql database table
-- update meta informations (tags, name of the video, description)
+- update meta informations (tags, name of the video, description except unique ids)
 - delete multimedia container file formats containing video, audio or subtitles (e.g. MP4, MOV, WEBM) in a Storage Account Container and delete associated meta information by id
 
 ### Rust essentials

@@ -2,19 +2,20 @@
 
 diesel::table! {
     container_meta (id) {
-        id -> Int4,
+        id -> Uuid,
         date_time_created -> Timestamptz,
         date_time_updated -> Timestamptz,
         title -> Varchar,
         description -> Varchar,
         tags -> Array<Nullable<Text>>,
-        file_meta_ids -> Array<Nullable<Int4>>,
+        file_meta_ids -> Array<Nullable<Uuid>>,
     }
 }
 
 diesel::table! {
     file_meta (id) {
-        id -> Int4,
+        id -> Uuid,
+        container_id -> Uuid,
         name -> Varchar,
         file_type -> Int4,
         file_size_in_kb -> Int8,

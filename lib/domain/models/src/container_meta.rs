@@ -3,6 +3,7 @@ use crate::schema::file_meta;
 use crate::enums::FileMetaType;
 use crate::file_meta::FileMeta;
 use crate::model::Model;
+use uuid::Uuid;
 
 extern crate chrono;
 
@@ -13,13 +14,13 @@ use diesel::prelude::*;
 #[diesel(table_name = container_meta)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ContainerMeta {
-    pub id: i32,
+    pub id: Uuid,
     pub date_time_created: DateTime<Utc>,
     pub date_time_updated: DateTime<Utc>,
     pub title: String,
     pub description: String,
     pub tags: Vec<Option<String>>,
-    pub file_meta_ids: Vec<Option<i32>>,
+    pub file_meta_ids: Vec<Option<Uuid>>,
 }
 
 impl Model for ContainerMeta {
@@ -44,14 +45,14 @@ mod tests {
     fn test_file_meta() {
         let mut file_meta_type = FileMetaType::Video;
         let mut video_file_meta = FileMeta::new();
-        video_file_meta.id = 1;
+        video_file_meta.id = Uuid::new_v4();
         video_file_meta.name = String::from("simple_video.h264");
         video_file_meta.file_type = file_meta_type.to_i32();
         video_file_meta.file_size_in_kb = 200000;
 
         file_meta_type = FileMetaType::Audio;
         let mut audio_file_meta = FileMeta::new();
-        video_file_meta.id = 2;
+        video_file_meta.id = Uuid::new_v4();
         audio_file_meta.name = String::from("simple_audio.aac");
         audio_file_meta.file_type = file_meta_type.to_i32();
         audio_file_meta.file_size_in_kb = 150000;
@@ -62,7 +63,7 @@ mod tests {
         let file_meta_ids: Vec<Option<i32>> = vec![Some(video_file_meta.id), Some(audio_file_meta.id)];
 
         let mut container_meta = ContainerMeta::new();
-        container_meta.id = 1;
+        container_meta.id = Uuid::new_v4();
         container_meta.date_time_created = current_date_time;
         container_meta.date_time_updated = current_date_time;
         container_meta.title = String::from("simple_container.mov");
@@ -70,7 +71,6 @@ mod tests {
         container_meta.tags = tags;
         container_meta.file_meta_ids = file_meta_ids;
 
-        assert_eq!(container_meta.id, 1);
         assert_eq!(container_meta.date_time_created, current_date_time);
         assert_eq!(container_meta.date_time_updated, current_date_time);
         assert_eq!(container_meta.title, String::from("simple_container.mov"));
