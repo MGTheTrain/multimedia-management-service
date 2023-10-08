@@ -1,10 +1,20 @@
 version: '3'
 services:
-  azurite:
-    image: mcr.microsoft.com/azure-storage/azurite
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: diesel-demo
     ports:
-      - "10000:10000"  # Blob service port
-      - "10001:10001"  # Queue service port
-      - "10002:10002"  # Table service port
+      - "5432:5432"
     volumes:
-      - /data 
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - custom-network
+
+volumes:
+  pg_data:
+
+networks:
+  custom-network:
