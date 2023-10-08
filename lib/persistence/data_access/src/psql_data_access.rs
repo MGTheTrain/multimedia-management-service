@@ -1,63 +1,69 @@
 use diesel::{ConnectionResult, PgConnection, Connection, ExpressionMethods, QueryDsl, RunQueryDsl, result::Error, SelectableHelper};
+use log::info;
+use models::enums::FileMetaType;
 use models::{file_meta::{FileMeta, self}, container_meta::ContainerMeta};
+use uuid::Uuid;
 extern crate models;
 
 pub struct PsqlDataAccess {
-    pg_connection: Option<PgConnection>,
+    // pg_connection: Option<PgConnection>,
 }
 
 impl PsqlDataAccess {
-  /// Method new for constructing an object from the struct PsqlDataAccess
-    ///
-    /// This method takes the database_url as a parameter,
-    /// and returns an PsqlDataAccess object
-    async fn new(database_url: &str) -> Result<Self, diesel::ConnectionError> {
-        let pg_connection = PgConnection::establish(database_url)?;
-        Ok(PsqlDataAccess {
-            pg_connection: Some(pg_connection),
-        })
+    fn new() -> Self {
+        PsqlDataAccess{}
     }
 
     fn insert_file_meta(&self, pg_connection: &mut PgConnection, in_file_meta: &models::file_meta::FileMeta) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta;
         
-        Ok(diesel::insert_into(file_meta::table)
-        .values(in_file_meta)
-        .returning(models::file_meta::FileMeta::as_returning())
-        .get_result(pg_connection)
-        .expect("Error saving file meta"))
+        let result = diesel::insert_into(file_meta::table)
+            .values(in_file_meta)
+            .returning(models::file_meta::FileMeta::as_returning())
+            .get_result(pg_connection)
+            .expect("Error saving file meta");
+
+        info!("Successfully inserted file metainformation with file_meta_id {}", in_file_meta.id);
+        Ok(result)
     }
 
     fn insert_container_meta(&self, pg_connection: &mut PgConnection, in_container_meta: &models::container_meta::ContainerMeta) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta;
         
-        Ok(diesel::insert_into(container_meta::table)
-        .values(in_container_meta)
-        .returning(models::container_meta::ContainerMeta::as_returning())
-        .get_result(pg_connection)
-        .expect("Error saving file meta"))
+        let result = diesel::insert_into(container_meta::table)
+            .values(in_container_meta)
+            .returning(models::container_meta::ContainerMeta::as_returning())
+            .get_result(pg_connection)
+            .expect("Error saving file meta");
+
+        info!("Successfully inserted container metainformation with container_meta_id {}", in_container_meta.id);
+        Ok(result)
     }
 
-    fn get_file_meta_by_id(&self, pg_connection: &mut PgConnection, file_meta_id: &i32) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
+    fn get_file_meta_by_id(&self, pg_connection: &mut PgConnection, file_meta_id: &Uuid) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
         
         let result = file_meta
         .filter(id.eq(file_meta_id))
         .first::<models::file_meta::FileMeta>(pg_connection)?;
+
+        info!("Successfully retrieved file metainformation by file_meta_id {}", file_meta_id);
         Ok(result)
     }
     
 
-    fn get_container_meta_by_id(&self,  pg_connection: &mut PgConnection, container_meta_id: &i32) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
+    fn get_container_meta_by_id(&self,  pg_connection: &mut PgConnection, container_meta_id: &Uuid) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
         let result = container_meta
         .filter(id.eq(container_meta_id))
         .first::<models::container_meta::ContainerMeta>(pg_connection)?;
+
+        info!("Successfully retrieved container metainformation by container_meta_id {}", container_meta_id);
         Ok(result)
     }
 
-    fn update_file_meta_by_id(&self, pg_connection: &mut PgConnection, file_meta_id: &i32, in_file_meta: &models::file_meta::FileMeta) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
+    fn update_file_meta_by_id(&self, pg_connection: &mut PgConnection, file_meta_id: &Uuid, in_file_meta: &models::file_meta::FileMeta) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
         let result = diesel::update(file_meta.filter(id.eq(file_meta_id)))
@@ -65,10 +71,11 @@ impl PsqlDataAccess {
         .returning(models::file_meta::FileMeta::as_returning())
         .get_result(pg_connection)?;
 
+        info!("Successfully updated file metainformation by file_meta_id {}", file_meta_id);
         Ok(result)
     }
 
-    fn update_container_meta_by_id(&self, pg_connection: &mut PgConnection, container_meta_id: &i32, in_container_meta: &models::container_meta::ContainerMeta) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
+    fn update_container_meta_by_id(&self, pg_connection: &mut PgConnection, container_meta_id: &Uuid, in_container_meta: &models::container_meta::ContainerMeta) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
         
         let result = diesel::update(container_meta.filter(id.eq(container_meta_id)))
@@ -81,14 +88,55 @@ impl PsqlDataAccess {
         .returning(models::container_meta::ContainerMeta::as_returning())
         .get_result(pg_connection)?;
 
+        info!("Successfully updated container metainformation by container_meta_id {}", container_meta_id);
         Ok(result)
     }
 
-    async fn delete_models_by_container_id(&self, container_id: &i32) -> Result<(), diesel::result::Error> {
-        
+    async fn delete_file_meta_by_id(&self, pg_connection: &mut PgConnection, container_meta_id: &Uuid) -> Result<(), diesel::result::Error> {
+        use models::schema::file_meta::dsl::*;
+        use models::schema::container_meta::dsl::*;
+
+        let rows_deleted = diesel::delete(file_meta.filter(container_meta_id.eq(container_meta_id)))
+            .execute(pg_connection)?;
+
+        info!("Successfully deleted {} rows", rows_deleted);
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // In order to run the test execute: `RUST_LOG=info cargo test`
+    #[tokio::test]
+    async fn test_psql_data_access_methods() -> Result<(), diesel::result::Error> {
+        env_logger::init();
+
+        let env_file_path = "./assets/psql-secrets.dev.cfg";
+        dotenv::from_path(env_file_path).ok();
+
+        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
+        let psql_data_access = Box::new(PsqlDataAccess::new());
+        let mut pg_connection = 
+            PgConnection::establish(&database_url).unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+
+        // file metainformation
+        let mut file_meta_type = FileMetaType::Video;
+        let video_file_meta = FileMeta {
+            id: Uuid::new_v4(),
+            container_meta_id: Uuid::new_v4(),
+            name: String::from("simple_video.h264"),
+            file_type: file_meta_type.to_i32(),
+            file_size_in_kb: 200000,
+        };
+
+        let result = psql_data_access.insert_file_meta(&mut pg_connection, &video_file_meta);
+        assert!(result.is_ok());
+        Ok(())
+    }
+}
+
 
 
 

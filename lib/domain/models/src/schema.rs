@@ -15,7 +15,7 @@ diesel::table! {
 diesel::table! {
     file_meta (id) {
         id -> Uuid,
-        container_id -> Uuid,
+        container_meta_id -> Uuid,
         name -> Varchar,
         file_type -> Int4,
         file_size_in_kb -> Int8,

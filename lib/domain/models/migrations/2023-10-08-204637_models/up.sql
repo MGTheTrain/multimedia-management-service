@@ -3,7 +3,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create the 'file_meta' table
 CREATE TABLE file_meta (
   id UUID DEFAULT uuid_generate_v4 (),
-  container_id UUID NOT NULL,
+  container_meta_id UUID NOT NULL,
   name VARCHAR NOT NULL,
   file_type INTEGER NOT NULL,
   file_size_in_kb BIGINT NOT NULL,
