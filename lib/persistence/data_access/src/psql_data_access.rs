@@ -1,4 +1,5 @@
 use diesel::{ConnectionResult, PgConnection, Connection};
+extern crate::models::ContainerMeta;
 
 pub struct PsqlDataAccess {
     pg_connection: Option<ConnectionResult<PgConnection>>,
