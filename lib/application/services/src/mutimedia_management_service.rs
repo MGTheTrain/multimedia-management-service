@@ -1,0 +1,7 @@
+struct MutimediaManagementService {
+
+}
+
+impl MutimediaManagementService {
+    
+}
