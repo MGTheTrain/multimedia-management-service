@@ -1,8 +1,8 @@
-use crate::schema::container_meta;
-use crate::schema::file_meta;
 use crate::enums::FileMetaType;
 use crate::file_meta::FileMeta;
 use crate::model::Model;
+use crate::schema::container_meta;
+use crate::schema::file_meta;
 use uuid::Uuid;
 
 extern crate chrono;
@@ -59,8 +59,12 @@ mod tests {
 
         // --
         let current_date_time = Utc::now();
-        let tags: Vec<Option<String>> = vec![Some(String::from("entertainment")), Some(String::from("music"))];
-        let file_meta_ids: Vec<Option<Uuid>> = vec![Some(video_file_meta.id), Some(audio_file_meta.id)];
+        let tags: Vec<Option<String>> = vec![
+            Some(String::from("entertainment")),
+            Some(String::from("music")),
+        ];
+        let file_meta_ids: Vec<Option<Uuid>> =
+            vec![Some(video_file_meta.id), Some(audio_file_meta.id)];
 
         let mut container_meta = ContainerMeta::new();
         container_meta.id = Uuid::new_v4();

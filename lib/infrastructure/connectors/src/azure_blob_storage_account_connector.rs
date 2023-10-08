@@ -1,10 +1,13 @@
-use std::{io::{BufReader, Read, Write}, fs::{File, self}};
+use std::{
+    fs::{self, File},
+    io::{BufReader, Read, Write},
+};
 
-use azure_core::{Error};
+use azure_core::Error;
 use azure_storage::prelude::*;
 use azure_storage_blobs::prelude::*;
 use bytes::Bytes;
-use log::{info};
+use log::info;
 pub struct AzureBlobStorageAccountConnector {
     container_client: Option<ContainerClient>,
 }
@@ -14,22 +17,26 @@ impl AzureBlobStorageAccountConnector {
     ///
     /// This method takes the account_name, access_key and container_name parameters,
     /// and returns an AzureBlobStorageAccountConnector object
-    fn new(
-        account_name: &str, 
-        access_key: &str,
-        container_name: &str) -> Self {
+    fn new(account_name: &str, access_key: &str, container_name: &str) -> Self {
         let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
         AzureBlobStorageAccountConnector {
-            container_client: Some(ClientBuilder::new(account_name, storage_credentials).container_client(container_name)),
+            container_client: Some(
+                ClientBuilder::new(account_name, storage_credentials)
+                    .container_client(container_name),
+            ),
         }
     }
 
     /// Private method for returning a blob client
-    /// 
+    ///
     /// This method takes &self and the blob_name,
     /// and returns an BlobClient object
     pub(crate) fn get_blob_client(&self, blob_name: &str) -> Option<BlobClient> {
-        let blob_client = self.container_client.as_ref().unwrap().blob_client(blob_name);
+        let blob_client = self
+            .container_client
+            .as_ref()
+            .unwrap()
+            .blob_client(blob_name);
         Some(blob_client)
     }
 
@@ -47,7 +54,6 @@ impl AzureBlobStorageAccountConnector {
         info!("Successfully uploaded blob {}", blob_name);
         Ok(())
     }
-
 
     /// Async method for retrieving the content of a blob from an Azure Storage Account Container
     ///
@@ -67,10 +73,10 @@ impl AzureBlobStorageAccountConnector {
         let data = self.retrieve_bytes(blob_name).await?;
 
         let mut file = fs::OpenOptions::new()
-            .create(true) 
+            .create(true)
             .write(true)
             .open(file_path)?;
-    
+
         file.write_all(&data)?;
         info!("Successfully downloaded blob {}", blob_name);
         Ok(())
@@ -100,22 +106,33 @@ mod tests {
         let env_file_path = "./assets/az-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
 
-        let azure_access_key = std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY not found in .cfg");
-        let azure_account_name = std::env::var("AZURE_ACCOUNT_NAME").expect("AZURE_ACCOUNT_NAME not found in .cfg");
-        let azure_container_name = std::env::var("AZURE_CONTAINER_NAME").expect("AZURE_CONTAINER_NAME not found in .cfg");
+        let azure_access_key =
+            std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY not found in .cfg");
+        let azure_account_name =
+            std::env::var("AZURE_ACCOUNT_NAME").expect("AZURE_ACCOUNT_NAME not found in .cfg");
+        let azure_container_name =
+            std::env::var("AZURE_CONTAINER_NAME").expect("AZURE_CONTAINER_NAME not found in .cfg");
 
-        let azure_blob_storage_account_connector = 
-            Box::new(AzureBlobStorageAccountConnector::new(
-                azure_account_name.as_str(), azure_access_key.as_str(), azure_container_name.as_str()));  
-        
+        let azure_blob_storage_account_connector = Box::new(AzureBlobStorageAccountConnector::new(
+            azure_account_name.as_str(),
+            azure_access_key.as_str(),
+            azure_container_name.as_str(),
+        ));
+
         let upload_file_path = "./assets/sample.txt";
         let download_file_path = "./temp/sample-azure-copy.txt";
         let blob_name = "sample.txt";
-        let upload_blob_result = azure_blob_storage_account_connector.upload_blob(blob_name, upload_file_path).await;
+        let upload_blob_result = azure_blob_storage_account_connector
+            .upload_blob(blob_name, upload_file_path)
+            .await;
         assert!(upload_blob_result.is_ok());
-        let download_blob_result = azure_blob_storage_account_connector.download_blob(blob_name, download_file_path).await;
+        let download_blob_result = azure_blob_storage_account_connector
+            .download_blob(blob_name, download_file_path)
+            .await;
         assert!(download_blob_result.is_ok());
-        let delete_blob_result = azure_blob_storage_account_connector.delete_blob(blob_name).await;
+        let delete_blob_result = azure_blob_storage_account_connector
+            .delete_blob(blob_name)
+            .await;
         assert!(delete_blob_result.is_ok());
         Ok(())
     }

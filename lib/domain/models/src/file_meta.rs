@@ -12,7 +12,8 @@ pub struct FileMeta {
     pub id: Uuid,
     pub container_meta_id: Uuid,
     pub name: String,
-    pub file_type: i32, /// utilize FileMetaType enum for file_type
+    pub file_type: i32,
+    /// utilize FileMetaType enum for file_type
     pub file_size_in_kb: i64,
 }
 
@@ -22,7 +23,7 @@ impl Model for FileMeta {
             id: Uuid::new_v4(),
             container_meta_id: Uuid::new_v4(),
             name: String::from(""),
-            file_type: 0, 
+            file_type: 0,
             file_size_in_kb: 0,
         }
     }
