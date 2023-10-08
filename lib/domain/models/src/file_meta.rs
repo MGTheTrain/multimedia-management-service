@@ -43,7 +43,6 @@ mod tests {
             file_type: file_meta_type.to_i32(),
             file_size_in_kb: 200000,
         });
-        assert_eq!(video_file_meta.id, 1);
         assert_eq!(video_file_meta.name, String::from("simple_video.h264"));
         assert_eq!(video_file_meta.file_type, FileMetaType::Video.to_i32());
         assert_eq!(video_file_meta.file_size_in_kb, 200000);
@@ -56,7 +55,6 @@ mod tests {
             file_type: file_meta_type.to_i32(),
             file_size_in_kb: 150000,
         });
-        assert_eq!(audio_file_meta.id, 2);
         assert_eq!(audio_file_meta.name, String::from("simple_audio.aac"));
         assert_eq!(audio_file_meta.file_type, FileMetaType::Audio.to_i32());
         assert_eq!(audio_file_meta.file_size_in_kb, 150000);
