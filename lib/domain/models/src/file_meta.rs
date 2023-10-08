@@ -19,8 +19,8 @@ pub struct FileMeta {
 impl Model for FileMeta {
     fn new() -> Self {
         FileMeta {
-            id: -1,
-            container_id: -1,
+            id: Uuid::new_v4(),
+            container_id: Uuid::new_v4(),
             name: String::from(""),
             file_type: 0, 
             file_size_in_kb: 0,

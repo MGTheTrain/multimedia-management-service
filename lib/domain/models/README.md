@@ -2,6 +2,8 @@
 
 ## How to create diesel migrations
 
+**Precondition**: `export DATABASE_URL=postgres://user:password@localhost:5432/diesel-demo` in terminal process in which to also utilize `diesel` cli tool
+
 0. Automatically create the `migrations folder` and `diesel.toml` trough `diesel setup` command in this folder
 1. In the `migrations folder` manually create a new migration, e.g. `2023-10-08-174636_models` folder 
 2. In the `2023-10-08-174636_models` folder add an `down.sql` and `up.sql`

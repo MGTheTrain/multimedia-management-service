@@ -26,7 +26,7 @@ pub struct ContainerMeta {
 impl Model for ContainerMeta {
     fn new() -> Self {
         ContainerMeta {
-            id: -1,
+            id: Uuid::new_v4(),
             date_time_created: Utc::now(),
             date_time_updated: Utc::now(),
             title: String::from(""),
