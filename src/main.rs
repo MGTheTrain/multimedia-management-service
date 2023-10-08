@@ -3,10 +3,8 @@ extern crate controllers;
 extern crate data_access;
 extern crate dtos;
 extern crate interfaces;
-extern crate migrations;
 extern crate models;
 extern crate services;
-extern crate settings;
 
 fn main() {
     models::hello();
@@ -17,5 +15,4 @@ fn main() {
     connectors::hello();
     settings::hello();
     data_access::hello();
-    migrations::hello();
 }

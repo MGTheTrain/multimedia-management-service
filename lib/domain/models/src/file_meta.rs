@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use crate::enums::FileMetaType;
 use crate::model::Model;
 
-#[derive(Insertable, Queryable, Identifiable, Debug, PartialEq)]
+#[derive(Insertable, Queryable, Selectable, Identifiable, Debug, PartialEq)]
 #[diesel(table_name = file_meta)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct FileMeta {

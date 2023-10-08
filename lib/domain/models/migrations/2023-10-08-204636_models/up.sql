@@ -1,6 +1,3 @@
--- CREATE TYPE file_meta_type_mapping AS ENUM ('Invalid', 'Video', 'Audio', 'Subtitle');
-
--- file_type file_meta_type_mapping NOT NULL,
 CREATE TABLE file_meta (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL,

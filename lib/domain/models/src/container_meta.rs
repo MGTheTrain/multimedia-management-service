@@ -9,7 +9,7 @@ extern crate chrono;
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 
-#[derive(Insertable, Queryable, Identifiable, Debug, PartialEq)]
+#[derive(Insertable, Queryable, Selectable, Identifiable, Debug, PartialEq)]
 #[diesel(table_name = container_meta)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ContainerMeta {
@@ -18,8 +18,8 @@ pub struct ContainerMeta {
     pub date_time_updated: DateTime<Utc>,
     pub title: String,
     pub description: String,
-    pub tags: Vec<String>,
-    pub file_meta_ids: Vec<i32>,
+    pub tags: Vec<Option<String>>,
+    pub file_meta_ids: Vec<Option<i32>>,
 }
 
 impl Model for ContainerMeta {
@@ -58,8 +58,8 @@ mod tests {
 
         // --
         let current_date_time = Utc::now();
-        let tags: Vec<String> = vec![String::from("entertainment"), String::from("music")];
-        let file_meta_ids: Vec<i32> = vec![video_file_meta.id, audio_file_meta.id];
+        let tags: Vec<Option<String>> = vec![Some(String::from("entertainment")), Some(String::from("music"))];
+        let file_meta_ids: Vec<Option<i32>> = vec![Some(video_file_meta.id), Some(audio_file_meta.id)];
 
         let mut container_meta = ContainerMeta::new();
         container_meta.id = 1;
