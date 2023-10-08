@@ -1,3 +1,5 @@
+use crate::schema::container_meta;
+use crate::schema::file_meta;
 use crate::enums::FileMetaType;
 use crate::file_meta::FileMeta;
 use crate::model::Model;
@@ -5,7 +7,11 @@ use crate::model::Model;
 extern crate chrono;
 
 use chrono::{DateTime, Utc};
+use diesel::prelude::*;
 
+#[derive(Insertable, Queryable, Identifiable, Debug, PartialEq)]
+#[diesel(table_name = container_meta)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct ContainerMeta {
     pub id: i32,
     pub date_time_created: DateTime<Utc>,

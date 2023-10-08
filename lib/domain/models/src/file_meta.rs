@@ -1,6 +1,12 @@
+use crate::schema::file_meta;
+use diesel::prelude::*;
+
 use crate::enums::FileMetaType;
 use crate::model::Model;
 
+#[derive(Insertable, Queryable, Identifiable, Debug, PartialEq)]
+#[diesel(table_name = file_meta)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct FileMeta {
     pub id: i32,
     pub name: String,
