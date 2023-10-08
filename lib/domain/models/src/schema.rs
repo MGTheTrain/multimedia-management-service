@@ -1,11 +1,5 @@
 // @generated automatically by Diesel CLI.
 
-pub mod sql_types {
-    #[derive(diesel::query_builder::QueryId, diesel::sql_types::SqlType)]
-    #[diesel(postgres_type(name = "file_meta_type"))]
-    pub struct FileMetaType;
-}
-
 diesel::table! {
     container_meta (id) {
         id -> Int4,
@@ -19,13 +13,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    use diesel::sql_types::*;
-    use super::sql_types::FileMetaType;
-
     file_meta (id) {
         id -> Int4,
         name -> Varchar,
-        file_type -> FileMetaType,
+        file_type -> Int4,
         file_size_in_kb -> Int8,
     }
 }

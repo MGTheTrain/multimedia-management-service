@@ -8,5 +8,4 @@ edition = "2021"
 [dependencies]
 chrono = "0.4"
 diesel = { version = "2.1.2", features = ["postgres", "chrono"] }
-diesel-derive-enum = { version = "2.1.0", features = ["postgres"] }
 dotenv = "0.15.0"

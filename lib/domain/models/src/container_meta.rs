@@ -42,16 +42,18 @@ mod tests {
 
     #[test]
     fn test_file_meta() {
+        let mut file_meta_type = FileMetaType::Video;
         let mut video_file_meta = FileMeta::new();
         video_file_meta.id = 1;
         video_file_meta.name = String::from("simple_video.h264");
-        video_file_meta.file_type = FileMetaType::Video;
+        video_file_meta.file_type = file_meta_type.to_i32();
         video_file_meta.file_size_in_kb = 200000;
 
+        file_meta_type = FileMetaType::Audio;
         let mut audio_file_meta = FileMeta::new();
         video_file_meta.id = 2;
         audio_file_meta.name = String::from("simple_audio.aac");
-        audio_file_meta.file_type = FileMetaType::Audio;
+        audio_file_meta.file_type = file_meta_type.to_i32();
         audio_file_meta.file_size_in_kb = 150000;
 
         // --
