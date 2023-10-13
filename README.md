@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Summary](#summary)
+- [Requirements](#requirements)
 - [Rust essentials](#rust-essentials)
 
 ### Summary
