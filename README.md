@@ -28,9 +28,7 @@ cargo new lib/web/controllers --lib
 cargo new lib/web/dtos --lib
 cargo new lib/application/services --lib
 cargo new lib/infrastructure/connectors --lib
-cargo new lib/infrastructure/settings --lib
 cargo new lib/persistence/data_access --lib
-cargo new lib/persistence/migrations --lib
 
 # For src/main.rs manually create the file and update the Cargo.toml to include internal and external crates
 ```
