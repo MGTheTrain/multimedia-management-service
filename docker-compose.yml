@@ -2,7 +2,7 @@ version: '3'
 services:
   postgres:
     # image: postgres:latest
-    image: postgres:16-alpine # on Windows OS. See: https://codereviewvideos.com/postgres-16-docker-workaround-program-postgres-is-needed-by-initdb/
+    image: postgres:13-alpine # on Windows OS. See: https://codereviewvideos.com/postgres-16-docker-workaround-program-postgres-is-needed-by-initdb/
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
