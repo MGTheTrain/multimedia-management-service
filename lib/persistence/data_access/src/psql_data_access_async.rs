@@ -1,5 +1,6 @@
-// Based on: [ https://crates.io/crates/diesel-async, https://github.com/weiznich/diesel_async ]
-// Not yet mature enough. Needs some time
+// Samples:
+// - https://github.com/weiznich/diesel_async/blob/main/tests/lib.rs 
+// - https://github.com/tokio-rs/axum/blob/main/examples/diesel-async-postgres/src/main.rs 
 
 use diesel::prelude::*;
 use diesel_async::{RunQueryDsl, AsyncConnection, AsyncPgConnection};
