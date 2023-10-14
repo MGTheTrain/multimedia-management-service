@@ -15,7 +15,6 @@ use models::{
     track::{self, VideoTrack, AudioTrack, SubtitleTrack},
 };
 use uuid::Uuid;
-extern crate models;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
 
