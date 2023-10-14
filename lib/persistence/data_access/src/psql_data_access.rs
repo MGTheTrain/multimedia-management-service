@@ -16,19 +16,19 @@ extern crate models;
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
 
 pub struct PsqlDataAccess {
-    connection_pool: Pool<ConnectionManager<PgConnection>>,
+    pub connection_pool: Pool<ConnectionManager<PgConnection>>,
 }
 
 impl PsqlDataAccess {
     /// Method for creating the PsqlDataAccess constructor
     ///
     /// Requires no parameters and returns and PsqlDataAccess object
-    pub fn new(database_url: &str) -> Self {
+    pub fn new(database_url: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let manager = ConnectionManager::<PgConnection>::new(database_url);
         let connection_pool = Pool::builder().build(manager)?;
-        PsqlDataAccess {
+        Ok(PsqlDataAccess {
             connection_pool: connection_pool
-        }
+        })
     }
 
     /// Method for inserting file_meta rows into a Psql database table utilizing diesel ORM
@@ -41,12 +41,11 @@ impl PsqlDataAccess {
     ) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta;
 
-        let pg_connection = self.connection_pool.get()?;
-
+        let mut pg_connection = self.connection_pool.get().unwrap();
         let result = diesel::insert_into(file_meta::table)
             .values(in_file_meta)
             .returning(models::file_meta::FileMeta::as_returning())
-            .get_result(pg_connection)
+            .get_result(&mut pg_connection)
             .expect("Error saving file meta");
 
         info!(
@@ -65,12 +64,12 @@ impl PsqlDataAccess {
     ) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let result = diesel::insert_into(container_meta::table)
             .values(in_container_meta)
             .returning(models::container_meta::ContainerMeta::as_returning())
-            .get_result(pg_connection)
+            .get_result(&mut pg_connection)
             .expect("Error saving file meta");
 
         info!(
@@ -89,11 +88,11 @@ impl PsqlDataAccess {
     ) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let result = file_meta
             .filter(id.eq(file_meta_id))
-            .first::<models::file_meta::FileMeta>(pg_connection)?;
+            .first::<models::file_meta::FileMeta>(&mut pg_connection)?;
 
         info!(
             "Successfully retrieved file metainformation by file_meta_id {}",
@@ -111,11 +110,11 @@ impl PsqlDataAccess {
     ) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let result = container_meta
             .filter(id.eq(container_meta_id))
-            .first::<models::container_meta::ContainerMeta>(pg_connection)?;
+            .first::<models::container_meta::ContainerMeta>(&mut pg_connection)?;
 
         info!(
             "Successfully retrieved container metainformation by container_meta_id {}",
@@ -134,7 +133,7 @@ impl PsqlDataAccess {
     ) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let result = diesel::update(file_meta.filter(id.eq(file_meta_id)))
             .set((
@@ -143,7 +142,7 @@ impl PsqlDataAccess {
                 file_size_in_kb.eq(&in_file_meta.file_size_in_kb),
             ))
             .returning(models::file_meta::FileMeta::as_returning())
-            .get_result(pg_connection)?;
+            .get_result(&mut pg_connection)?;
 
         info!(
             "Successfully updated file metainformation by file_meta_id {}",
@@ -162,7 +161,7 @@ impl PsqlDataAccess {
     ) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let result = diesel::update(container_meta.filter(id.eq(container_meta_id)))
             .set((
@@ -174,7 +173,7 @@ impl PsqlDataAccess {
                 file_meta_ids.eq(&in_container_meta.file_meta_ids),
             ))
             .returning(models::container_meta::ContainerMeta::as_returning())
-            .get_result(pg_connection)?;
+            .get_result(&mut pg_connection)?;
 
         info!(
             "Successfully updated container metainformation by container_meta_id {}",
@@ -192,10 +191,10 @@ impl PsqlDataAccess {
     ) -> Result<(), diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let rows_deleted =
-            diesel::delete(file_meta.filter(id.eq(file_meta_id))).execute(pg_connection)?;
+            diesel::delete(file_meta.filter(id.eq(file_meta_id))).execute(&mut pg_connection)?;
 
         info!("Successfully deleted {}", file_meta_id);
         Ok(())
@@ -204,16 +203,16 @@ impl PsqlDataAccess {
     /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
     ///
     /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
-    pub fn delete_container_meta_by_id(
+    pub     fn delete_container_meta_by_id(
         &self,
         container_meta_id: &Uuid,
     ) -> Result<(), diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
-        let pg_connection = self.connection_pool.get()?;
+        let mut pg_connection = self.connection_pool.get().unwrap();
 
         let rows_deleted = diesel::delete(container_meta.filter(id.eq(container_meta_id)))
-            .execute(pg_connection)?;
+            .execute(&mut pg_connection)?;
 
         info!("Successfully deleted {}", container_meta_id);
         Ok(())
@@ -235,7 +234,7 @@ mod tests {
         dotenv::from_path(env_file_path).ok();
 
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
-        let psql_data_access = Box::new(PsqlDataAccess::new(&database_url));
+        let psql_data_access = Box::new(PsqlDataAccess::new(&database_url).unwrap());
         let mut migration_pg_connection = PgConnection::establish(&database_url)
             .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
 
