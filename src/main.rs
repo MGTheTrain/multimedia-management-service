@@ -1,6 +1,7 @@
 use models::model::Model;
 
 extern crate connectors;
+extern crate parsers;
 extern crate controllers;
 extern crate data_access;
 extern crate dtos;

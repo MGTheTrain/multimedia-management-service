@@ -4,8 +4,6 @@ use crate::schema::audio_track;
 use diesel::prelude::*;
 use uuid::Uuid;
 
-use crate::model::Model;
-
 #[derive(Insertable, Queryable, Selectable, Identifiable, Debug, PartialEq)]
 #[diesel(table_name = video_track)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -20,11 +18,11 @@ pub struct VideoTrack {
     pub frame_rate: i32,
 }
 
-impl Model for VideoTrack {
+impl VideoTrack {
     /// Method constructing a VideoTrack object
     /// 
     /// Requires no paramters and returns a VideoTrack object
-    fn new() -> Self {
+    pub fn new() -> Self {
         VideoTrack {
             id: Uuid::nil(),
             container_meta_id: Uuid::nil(),
@@ -51,11 +49,11 @@ pub struct AudioTrack {
     pub sample_frequenz: i32, // in hz
 }
 
-impl Model for AudioTrack {
+impl AudioTrack {
     /// Method constructing a AudioTrack object
     /// 
     /// Requires no paramters and returns a AudioTrack object
-    fn new() -> Self {
+    pub fn new() -> Self {
         AudioTrack {
             id: Uuid::nil(),
             container_meta_id: Uuid::nil(),
@@ -78,11 +76,11 @@ pub struct SubtitleTrack {
     pub media_type: String,
 }
 
-impl Model for SubtitleTrack {
+impl SubtitleTrack {
     /// Method constructing a SubtitleTrack object
     /// 
     /// Requires no paramters and returns a SubtitleTrack object
-    fn new() -> Self {
+    pub fn new() -> Self {
         SubtitleTrack {
             id: Uuid::nil(),
             container_meta_id: Uuid::nil(),

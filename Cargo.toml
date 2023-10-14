@@ -9,4 +9,5 @@ controllers = { path = "lib/web/controllers" }
 dtos = { path = "lib/web/dtos" }
 services = { path = "lib/application/services" }
 connectors = { path = "lib/infrastructure/connectors" }
+parsers = { path = "lib/infrastructure/parsers" }
 data_access = { path = "lib/persistence/data_access" }
