@@ -23,9 +23,16 @@ impl PsqlDataAccess {
     /// Method for creating the PsqlDataAccess constructor
     ///
     /// Requires no parameters and returns and PsqlDataAccess object
-    pub fn new(database_url: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
         let manager = ConnectionManager::<PgConnection>::new(database_url);
         let connection_pool = Pool::builder().build(manager)?;
+
+        // migrations at compile time       
+        let mut pg_connection = connection_pool.get().unwrap();
+        info!("About to migrate datbase tables");
+        pg_connection.run_pending_migrations(MIGRATIONS).unwrap();
+
         Ok(PsqlDataAccess {
             connection_pool: connection_pool
         })
@@ -233,15 +240,8 @@ mod tests {
         let env_file_path = "./assets/psql-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
 
-        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
-        let psql_data_access = Box::new(PsqlDataAccess::new(&database_url).unwrap());
-        let mut migration_pg_connection = PgConnection::establish(&database_url)
-            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
-
-        // migrations at compile time       
-        info!("About to migrate datbase tables");
-        migration_pg_connection.run_pending_migrations(MIGRATIONS).unwrap();
-
+        let psql_data_access = Box::new(PsqlDataAccess::new().unwrap());
+        
         // file metainformation
         let mut file_meta_type = FileMetaType::Video;
         let mut video_file_meta = FileMeta {
