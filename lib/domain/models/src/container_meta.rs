@@ -20,7 +20,7 @@ pub struct ContainerMeta {
     pub tags: Vec<Option<String>>,
     pub track_ids: Vec<Option<Uuid>>,
     pub file_size_in_kb: i64,
-    pub duration: i64,
+    pub duration: f64,
 }
 
 impl Model for ContainerMeta {
@@ -34,7 +34,7 @@ impl Model for ContainerMeta {
             tags: Vec::new(),
             track_ids: Vec::new(),
             file_size_in_kb: 0,
-            duration: 0,
+            duration: 0.0,
         }
     }
 }

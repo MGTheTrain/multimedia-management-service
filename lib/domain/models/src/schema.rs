@@ -10,7 +10,7 @@ diesel::table! {
         tags -> Array<Nullable<Text>>,
         track_ids -> Array<Nullable<Uuid>>,
         file_size_in_kb -> Int8,
-        duration -> Int8,
+        duration -> Float8,
     }
 }
 

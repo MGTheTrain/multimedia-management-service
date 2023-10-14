@@ -20,6 +20,6 @@ CREATE TABLE container_meta (
   tags TEXT[] NOT NULL,
   track_ids UUID[] NOT NULL,
   file_size_in_kb BIGINT NOT NULL,
-  duration BIGINT NOT NULL,
+  duration DOUBLE PRECISION NOT NULL,
   PRIMARY KEY (id)
 );
