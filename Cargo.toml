@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 models = { path = "lib/domain/models" }
-interfaces = { path = "lib/domain/interfaces" }
 controllers = { path = "lib/web/controllers" }
 dtos = { path = "lib/web/dtos" }
 services = { path = "lib/application/services" }
