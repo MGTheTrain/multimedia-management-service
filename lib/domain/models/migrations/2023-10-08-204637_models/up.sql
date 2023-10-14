@@ -6,6 +6,7 @@ CREATE TABLE track (
   container_meta_id UUID NOT NULL,
   name VARCHAR NOT NULL,
   file_type INTEGER NOT NULL,
+  media_type VARCHAR NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -19,5 +20,6 @@ CREATE TABLE container_meta (
   tags TEXT[] NOT NULL,
   track_ids UUID[] NOT NULL,
   file_size_in_kb BIGINT NOT NULL,
+  duration BIGINT NOT NULL,
   PRIMARY KEY (id)
 );

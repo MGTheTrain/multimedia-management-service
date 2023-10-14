@@ -10,6 +10,7 @@ diesel::table! {
         tags -> Array<Nullable<Text>>,
         track_ids -> Array<Nullable<Uuid>>,
         file_size_in_kb -> Int8,
+        duration -> Int8,
     }
 }
 
@@ -19,6 +20,7 @@ diesel::table! {
         container_meta_id -> Uuid,
         name -> Varchar,
         file_type -> Int4,
+        media_type -> Varchar,
     }
 }
 

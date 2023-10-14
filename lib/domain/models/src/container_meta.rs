@@ -20,6 +20,7 @@ pub struct ContainerMeta {
     pub tags: Vec<Option<String>>,
     pub track_ids: Vec<Option<Uuid>>,
     pub file_size_in_kb: i64,
+    pub duration: i64,
 }
 
 impl Model for ContainerMeta {
@@ -32,7 +33,8 @@ impl Model for ContainerMeta {
             description: String::from(""),
             tags: Vec::new(),
             track_ids: Vec::new(),
-            file_size_in_kb: 0
+            file_size_in_kb: 0,
+            duration: 0,
         }
     }
 }
@@ -73,6 +75,7 @@ mod tests {
         container_meta.tags = tags;
         container_meta.track_ids = track_ids;
         container_meta.file_size_in_kb = 100000;
+        container_meta.duration = 200.23;
 
         assert_eq!(container_meta.date_time_created, current_date_time);
         assert_eq!(container_meta.date_time_updated, current_date_time);
@@ -81,5 +84,6 @@ mod tests {
         assert_eq!(container_meta.tags.len(), 2);
         assert_eq!(container_meta.track_ids.len(), 2);
         assert_eq!(container_meta.file_size_in_kb, 100000);
+        assert_eq!(container_meta.duration, 200.23);
     }
 }
