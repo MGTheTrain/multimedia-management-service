@@ -4,6 +4,7 @@
 
 use diesel::prelude::*;
 use diesel_async::{RunQueryDsl, AsyncConnection, AsyncPgConnection};
+// use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use log::info;
 use models::enums::FileMetaType;
 use models::{
@@ -12,6 +13,8 @@ use models::{
 };
 use uuid::Uuid;
 extern crate models;
+
+// pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
 
 pub struct PsqlDataAccess {
     // pg_connection: Option<PgConnection>,
@@ -211,7 +214,7 @@ mod tests {
 
     // In order to run the test execute: `RUST_LOG=info cargo test`
     #[tokio::test]
-    async fn test_psql_data_access_methods_for_file_meta() -> Result<(), diesel::result::Error>{
+    async fn test_psql_data_access_methods_for_file_meta() -> Result<(), Box<dyn std::error::Error>>{
         env_logger::init();
         
         let env_file_path = "./assets/psql-secrets.dev.cfg";
@@ -220,6 +223,10 @@ mod tests {
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
         let psql_data_access = Box::new(PsqlDataAccess::new());
         let mut pg_connection = AsyncPgConnection::establish(&database_url).await.unwrap();
+
+        // // migrations at compile time       
+        // info!("About to migrate datbase tables");
+        // pg_connection.run_pending_migrations(MIGRATIONS).await;
 
         // file metainformation
         let mut file_meta_type = FileMetaType::Video;
