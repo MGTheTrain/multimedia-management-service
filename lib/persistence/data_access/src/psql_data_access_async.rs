@@ -273,7 +273,6 @@ mod tests {
 
         // [U]pdate
         video_file_meta.name = String::from("simple_updated_video.h264");
-        video_file_meta.file_size_in_kb = 400000;
         result = psql_data_access.update_file_meta_by_id(
             &video_file_meta.id,
             &video_file_meta,

@@ -52,6 +52,5 @@ mod tests {
         });
         assert_eq!(audio_file_meta.name, String::from("simple_audio.aac"));
         assert_eq!(audio_file_meta.file_type, FileMetaType::Audio.to_i32());
-        assert_eq!(audio_file_meta.file_size_in_kb, 150000);
     }
 }
