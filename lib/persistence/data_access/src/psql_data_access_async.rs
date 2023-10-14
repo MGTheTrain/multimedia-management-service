@@ -28,9 +28,11 @@ impl PsqlDataAccess {
 /// Method for creating the PsqlDataAccess constructor
     ///
     /// Requires no parameters and returns and PsqlDataAccess object
-    pub async fn new(database_url: &str) -> Result<Self, Box<dyn std::error::Error>> {
+    pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
         let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
         let connection_pool = Pool::builder().build(config).await.unwrap();
+
         Ok(PsqlDataAccess {
             connection_pool: connection_pool
         })
@@ -227,10 +229,11 @@ mod tests {
         let env_file_path = "./assets/psql-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
         
+        let psql_data_access = Box::new(PsqlDataAccess::new().await.unwrap());
+        
+        // migrations at compile time     
+        // NOTE: workaround for async_diesel     
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
-        let psql_data_access = Box::new(PsqlDataAccess::new(&database_url).await.unwrap());
-
-        // migrations at compile time       
         let mut migration_pg_connection = PgConnection::establish(&database_url).
             unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
         info!("About to migrate datbase tables");
