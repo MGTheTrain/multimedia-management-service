@@ -46,12 +46,11 @@ impl Model for ContainerMeta {
 
 #[cfg(test)]
 mod tests {
-    use crate::{subtitle_track, schema::container_meta::audio_track_id};
-
     use super::*;
-
+    
+    // In order to run the test execute: `RUST_LOG=info cargo test`
     #[test]
-    fn test_tracks() {
+    fn test_container_meta() {
         let container_meta_id = Uuid::new_v4();
 
         let mut video_track = VideoTrack::new();
