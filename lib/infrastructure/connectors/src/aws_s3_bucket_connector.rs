@@ -20,6 +20,7 @@ use std::{
 use log::info;
 
 pub struct AwsS3BucketConnector {
+    bucket_name: Option<String>,
     storage_client: Option<Client>,
 }
 
@@ -28,9 +29,10 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes no parameters,
     /// and returns an AwsS3BucketConnector object
-    pub async fn new() -> Self {
+    pub async fn new(bucket_name: &str) -> Self {
         let config = aws_config::load_from_env().await;
         AwsS3BucketConnector {
+            bucket_name: Some(String::from(bucket_name)),
             storage_client: Some(Client::new(&config)),
         }
     }
@@ -41,14 +43,13 @@ impl AwsS3BucketConnector {
     /// and returns an Result<GetObjectOutput, SdkError<GetObjectError>> object
     pub async fn get_object(
         &self,
-        bucket_name: &str,
         key: &str,
     ) -> Result<GetObjectOutput, SdkError<GetObjectError>> {
         self.storage_client
             .as_ref()
             .unwrap()
             .get_object()
-            .bucket(bucket_name)
+            .bucket(self.bucket_name.as_ref().unwrap())
             .key(key)
             .send()
             .await
@@ -60,7 +61,6 @@ impl AwsS3BucketConnector {
     /// and returns an Result<PutObjectOutput, SdkError<PutObjectError>> object
     pub async fn upload_blob(
         &self,
-        bucket_name: &str,
         key: &str,
         file_name: &str,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>> {
@@ -70,7 +70,7 @@ impl AwsS3BucketConnector {
             .as_ref()
             .unwrap()
             .put_object()
-            .bucket(bucket_name)
+            .bucket(self.bucket_name.as_ref().unwrap())
             .key(key)
             .body(body.unwrap())
             .send()
@@ -96,14 +96,14 @@ impl AwsS3BucketConnector {
 
     /// Async method for deleting blobs from an AWS S3 Bucket
     ///
-    /// This method takes &self, the bucket_name and the key as parameters,
+    /// This method takes &self and the key as parameters,
     /// and returns an Result<(), Error> object
-    pub async fn delete_blob(&self, bucket_name: &str, key: &str) -> Result<(), Error> {
+    pub async fn delete_blob(&self, key: &str) -> Result<(), Error> {
         self.storage_client
             .as_ref()
             .unwrap()
             .delete_object()
-            .bucket(bucket_name)
+            .bucket(self.bucket_name.as_ref().unwrap())
             .key(key)
             .send()
             .await?;
@@ -125,18 +125,18 @@ mod tests {
         let env_file_path = "./assets/aws-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
 
-        let aws_s3_bucket_connector = Box::new(AwsS3BucketConnector::new().await);
-
         let bucket_name =
-            std::env::var("AWS_BUCKET_NAME").expect("AWS_BUCKET_NAME not found in .cfg");
+            std::env::var("AWS_BUCKET_NAME")?;
+        let aws_s3_bucket_connector = Box::new(AwsS3BucketConnector::new(&bucket_name).await);
+
         let key = "sample.txt";
         let upload_file_path = "assets/sample.txt";
         let download_file_path = "temp/sample-aws-copy.txt";
         let upload_blob_result = aws_s3_bucket_connector
-            .upload_blob(bucket_name.as_str(), key, upload_file_path)
+            .upload_blob( key, upload_file_path)
             .await;
         assert!(upload_blob_result.is_ok());
-        let get_object_output = aws_s3_bucket_connector.get_object(bucket_name.as_str(), key).await;
+        let get_object_output = aws_s3_bucket_connector.get_object( key).await;
         assert!(get_object_output.is_ok());
         let bytes = get_object_output?
             .body
@@ -149,7 +149,7 @@ mod tests {
             .write_bytes_to_file(&bytes, download_file_path)
             .await;
         assert!(write_bytes_to_file_result.is_ok());
-        let delete_blob_result = aws_s3_bucket_connector.delete_blob(bucket_name.as_str(), key).await;
+        let delete_blob_result = aws_s3_bucket_connector.delete_blob( key).await;
         assert!(delete_blob_result.is_ok());
         Ok(())
     }
