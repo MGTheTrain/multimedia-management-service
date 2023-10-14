@@ -14,4 +14,4 @@
 
 ## Automatic diesel migrations in code at compile time
 
-The [psql_data_access_async.rs](../../persistence/data_access/src/psql_data_access_async.rs) and [psql_data_access.rs](../../persistence/data_access/src/psql_data_access.rs) shows in the tests how to migrate with the `run_pending_migrations(...)` method during compile time (e.g. `cargo build`). The previous section **How to create manual diesel migrations** is not necessary required.
+The [psql_data_access_async.rs](../../persistence/data_access/src/psql_data_access_async.rs) and [psql_data_access.rs](../../persistence/data_access/src/psql_data_access.rs) shows in the tests how to migrate with the `run_pending_migrations(...)` method during compile time (e.g. `cargo build`). The steps in the previous section **How to create manual diesel migrations** are not required.
