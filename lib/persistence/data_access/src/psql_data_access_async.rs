@@ -185,22 +185,22 @@ impl PsqlDataAccess {
         Ok(())
     }
 
-    // /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
-    // ///
-    // /// Requires a pg_connection, a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
-    // async fn delete_container_meta_by_id(
-    //     &self,
-    //     pg_connection: &mut AsyncPgConnection,
-    //     container_meta_id: &Uuid,
-    // ) -> Result<(), diesel::result::Error> {
-    //     use models::schema::container_meta::dsl::*;
+    /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
+    ///
+    /// Requires a pg_connection, a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
+    async fn delete_container_meta_by_id(
+        &self,
+        pg_connection: &mut AsyncPgConnection,
+        container_meta_id: &Uuid,
+    ) -> Result<(), diesel::result::Error> {
+        use models::schema::container_meta::dsl::*;
 
-    //     let rows_deleted = diesel::delete(container_meta.filter(id.eq(container_meta_id)))
-    //         .execute(pg_connection).await?;
+        let rows_deleted = diesel::delete(container_meta.filter(id.eq(container_meta_id)))
+            .execute(pg_connection).await?;
 
-    //     info!("Successfully deleted {}", container_meta_id);
-    //     Ok(())
-    // }
+        info!("Successfully deleted {}", container_meta_id);
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -213,10 +213,10 @@ mod tests {
     #[tokio::test]
     async fn test_psql_data_access_methods_for_file_meta() -> Result<(), diesel::result::Error>{
         env_logger::init();
-
+        
         let env_file_path = "./assets/psql-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
-
+        
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
         let psql_data_access = Box::new(PsqlDataAccess::new());
         let mut pg_connection = AsyncPgConnection::establish(&database_url).await.unwrap();
