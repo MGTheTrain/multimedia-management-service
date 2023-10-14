@@ -125,6 +125,10 @@ mod tests {
         let env_file_path = "./assets/aws-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
 
+        std::env::var("AWS_ACCESS_KEY_ID")?;
+        std::env::var("AWS_SECRET_ACCESS_KEY")?;
+        std::env::var("AWS_DEFAULT_REGION")?;
+        std::env::var("AWS_ENDPOINT_URL")?;
         let bucket_name =
             std::env::var("AWS_BUCKET_NAME")?;
         let aws_s3_bucket_connector = Box::new(AwsS3BucketConnector::new(&bucket_name).await);
