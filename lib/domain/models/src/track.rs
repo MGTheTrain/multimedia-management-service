@@ -1,80 +1,101 @@
-use crate::schema::track;
+use crate::schema::subtitle_track;
+use crate::schema::video_track;
+use crate::schema::audio_track;
 use diesel::prelude::*;
 use uuid::Uuid;
 
-use crate::enums::TrackType;
 use crate::model::Model;
 
 #[derive(Insertable, Queryable, Selectable, Identifiable, Debug, PartialEq)]
-#[diesel(table_name = track)]
+#[diesel(table_name = video_track)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct Track {
+pub struct VideoTrack {
     pub id: Uuid,
     pub container_meta_id: Uuid,
     pub name: String,
-    pub file_type: i32, // utilize TrackType enum for file_type
+    pub media_type: String,
+    pub width: i32,
+    pub height: i32,
+    pub bit_rate: i32,
+    pub frame_rate: i32,
+}
+
+impl Model for VideoTrack {
+    fn new() -> Self {
+        VideoTrack {
+            id: Uuid::nil(),
+            container_meta_id: Uuid::nil(),
+            name: String::from(""),
+            media_type: String::from(""),
+            width: 0,
+            height: 0,
+            bit_rate: 0,
+            frame_rate: 0,
+        }
+    }
+}
+
+#[derive(Insertable, Queryable, Selectable, Identifiable, Debug, PartialEq)]
+#[diesel(table_name = audio_track)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct AudioTrack {
+    pub id: Uuid,
+    pub container_meta_id: Uuid,
+    pub name: String,
+    pub media_type: String,
+    pub bit_rate: i32,
+    pub channel_config: String,
+    pub sample_frequenz: i32, // in hz
+}
+
+impl Model for AudioTrack {
+    fn new() -> Self {
+        AudioTrack {
+            id: Uuid::nil(),
+            container_meta_id: Uuid::nil(),
+            name: String::from(""),
+            media_type: String::from(""),
+            bit_rate: 0,
+            channel_config: String::from(""),
+            sample_frequenz: 0, // in hz
+        }
+    }
+}
+
+#[derive(Insertable, Queryable, Selectable, Identifiable, Debug, PartialEq)]
+#[diesel(table_name = subtitle_track)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct SubtitleTrack {
+    pub id: Uuid,
+    pub container_meta_id: Uuid,
+    pub name: String,
     pub media_type: String,
 }
 
-impl Model for Track {
+impl Model for SubtitleTrack {
     fn new() -> Self {
-        Track {
-            id: Uuid::new_v4(),
-            container_meta_id: Uuid::new_v4(),
+        SubtitleTrack {
+            id: Uuid::nil(),
+            container_meta_id: Uuid::nil(),
             name: String::from(""),
-            file_type: 0,
             media_type: String::from(""),
         }
     }
 }
 
-// future task: consider splitting into audio, video and subtitle tracks which inherit from `Track` struct to gather more information
-// See: https://github.com/alfg/mp4-rust/blob/master/examples/mp4info.rs
-// command: cargo run --example mp4info  D:\videos\earth.mp4  
-// File:
-//   file size:          24406814
-//   major_brand:        M4V
-//   compatible_brands:  M4V  mp42 isom
-// Movie:
-//   version:        0
-//   creation time:  1439235748
-//   duration:       97.834s
-//   fragments:      false
-//   timescale:      90000
-// Found 2 Tracks
-//   Track: #2(eng) Audio: aac (LC) (mp4a / 0x6D703461), 48000 Hz, stereo, 157 kb/s
-//   Track: #1(eng) Video: h264 (Baseline) (avc1 / 0x61766331), 1280x720, 1835 kb/s, 30.00 fps
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_track() {
-        // Track::new() when wanting to create a file meta object trough its constructor on the stack memory
-        let mut track_type = TrackType::Video;
-        let video_track = Box::new(Track {
-            id: Uuid::new_v4(),
-            container_meta_id: Uuid::new_v4(),
-            name: String::from("simple_video.h264"),
-            file_type: track_type.to_i32(),
-            media_type: String::from("h264"),
-        });
-        assert_eq!(video_track.name, String::from("simple_video.h264"));
-        assert_eq!(video_track.file_type, TrackType::Video.to_i32());
-        assert_eq!(video_track.media_type, String::from("h264"));
-
-        track_type = TrackType::Audio;
-        let audio_track = Box::new(Track {
-            id: Uuid::new_v4(),
-            container_meta_id: Uuid::new_v4(),
-            name: String::from("simple_audio.aac"),
-            file_type: track_type.to_i32(),
-            media_type: String::from("aac"),
-        });
-        assert_eq!(audio_track.name, String::from("simple_audio.aac"));
-        assert_eq!(audio_track.file_type, TrackType::Audio.to_i32());
-        assert_eq!(audio_track.media_type, String::from("aac"));
-
-    }
-}
+// // future task: consider splitting into audio, video and subtitle tracks struct to gather more information
+// // See: https://github.com/alfg/mp4-rust/blob/master/examples/mp4info.rs
+// // command: cargo run --example mp4info  D:\videos\earth.mp4  
+// // File:
+// //   file size:          24406814
+// //   major_brand:        M4V
+// //   compatible_brands:  M4V  mp42 isom
+// // Movie:
+// //   version:        0
+// //   creation time:  1439235748
+// //   duration:       97.834s
+// //   fragments:      false
+// //   timescale:      90000
+// // Found 2 Tracks
+// //   Track: #2(eng) Audio: aac (LC) (mp4a / 0x6D703461), 48000 Hz, stereo, 157 kb/s
+// //   Track: #1(eng) Video: h264 (Baseline) (avc1 / 0x61766331), 1280x720, 1835 kb/s, 30.00 fps
