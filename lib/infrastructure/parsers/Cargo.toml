@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 mp4 = "0.14.0"
+uuid = { version = "1.4.1", features = [ "v4"]}
 models = { path = "../../domain/models" }
