@@ -19,30 +19,6 @@ use std::{
 
 use log::info;
 
-pub struct AwsS3BucketConnectorSettings {}
-impl AwsS3BucketConnectorSettings {
-    /// Method new for constructing an object from the struct AwsS3BucketConnectorSettings
-    ///
-    /// This method takes no parameters,
-    /// and returns an AwsS3BucketConnectorSettings object
-    pub fn new() -> Self {
-        AwsS3BucketConnectorSettings {}
-    }
-
-    /// Method for checking if all attributes exist as env vars 
-    ///
-    /// This method takes &self as parameter,
-    /// and returns a Result<(), Box<dyn std::error::Error>> object
-    fn check_if_env_vars_exist(&self) -> Result<(), Box<dyn std::error::Error>> {
-        std::env::var("AWS_ACCESS_KEY_ID").expect("AWS_ACCESS_KEY_ID environment variable expected");
-        std::env::var("AWS_SECRET_ACCESS_KEY").expect("AWS_SECRET_ACCESS_KEY environment variable expected");
-        std::env::var("AWS_DEFAULT_REGION").expect("AWS_DEFAULT_REGION environment variable expected");
-        std::env::var("AWS_ENDPOINT_URL").expect("AWS_ENDPOINT_URL environment variable expected");
-        std::env::var("AWS_BUCKET_NAME").expect("AWS_BUCKET_NAME environment variable expected");
-        Ok(())
-    }
-}
-
 pub struct AwsS3BucketConnector {
     bucket_name: Option<String>,
     storage_client: Option<Client>,
@@ -53,12 +29,19 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes no parameters,
     /// and returns an AwsS3BucketConnector object
-    pub async fn new(bucket_name: &str) -> Self {
+    pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        std::env::var("AWS_ACCESS_KEY_ID").expect("AWS_ACCESS_KEY_ID environment variable expected");
+        std::env::var("AWS_SECRET_ACCESS_KEY").expect("AWS_SECRET_ACCESS_KEY environment variable expected");
+        std::env::var("AWS_DEFAULT_REGION").expect("AWS_DEFAULT_REGION environment variable expected");
+        std::env::var("AWS_ENDPOINT_URL").expect("AWS_ENDPOINT_URL environment variable expected");
+        let bucket_name =
+            std::env::var("AWS_BUCKET_NAME").expect("AWS_BUCKET_NAME environment variable expected");
+
         let config = aws_config::load_from_env().await;
-        AwsS3BucketConnector {
+        Ok(AwsS3BucketConnector {
             bucket_name: Some(String::from(bucket_name)),
             storage_client: Some(Client::new(&config)),
-        }
+        })
     }
 
     /// Private method for returning a blob client
@@ -148,13 +131,7 @@ mod tests {
 
         let env_file_path = "./assets/aws-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
-
-        let aws_s3_bucket_connector_settings = AwsS3BucketConnectorSettings::new();
-        aws_s3_bucket_connector_settings.check_if_env_vars_exist()?;
-
-        let bucket_name =
-            std::env::var("AWS_BUCKET_NAME").expect("AWS_BUCKET_NAME environment variable expected");
-        let aws_s3_bucket_connector = Box::new(AwsS3BucketConnector::new(&bucket_name).await);
+        let aws_s3_bucket_connector = Box::new(AwsS3BucketConnector::new().await.unwrap());
 
         let key = "sample.txt";
         let upload_file_path = "assets/sample.txt";
