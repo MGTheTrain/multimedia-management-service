@@ -17,7 +17,7 @@ impl AzureBlobStorageAccountConnector {
     ///
     /// This method takes the account_name, access_key and container_name parameters,
     /// and returns an AzureBlobStorageAccountConnector object
-    fn new(account_name: &str, access_key: &str, container_name: &str) -> Self {
+    pub fn new(account_name: &str, access_key: &str, container_name: &str) -> Self {
         let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
         AzureBlobStorageAccountConnector {
             container_client: Some(
@@ -44,7 +44,7 @@ impl AzureBlobStorageAccountConnector {
     ///
     /// This method takes &self, the blob_name and a file_path as parameters,
     /// and returns an Result<(), Error> object
-    async fn upload_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
+    pub async fn upload_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
         let f = File::open(file_path)?;
         let mut reader = BufReader::new(f);
@@ -59,7 +59,7 @@ impl AzureBlobStorageAccountConnector {
     ///
     /// This method takes &self and the blob_name as parameters,
     /// and returns an Result<Vec<u8>, Error> object
-    async fn retrieve_bytes(&self, blob_name: &str) -> Result<Vec<u8>, Error> {
+    pub async fn retrieve_bytes(&self, blob_name: &str) -> Result<Vec<u8>, Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
         let data = blob_client.get_content().await?;
         Ok(data)
@@ -69,7 +69,7 @@ impl AzureBlobStorageAccountConnector {
     ///
     /// This method takes &self, the blob_name and a file_path as parameters,
     /// and returns an Result<(), Error> object
-    async fn download_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
+    pub async fn download_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
         let data = self.retrieve_bytes(blob_name).await?;
 
         let mut file = fs::OpenOptions::new()
@@ -86,7 +86,7 @@ impl AzureBlobStorageAccountConnector {
     ///
     /// This method takes &self and the blob_name as parameters,
     /// and returns an Result<(), Error> object
-    async fn delete_blob(&self, blob_name: &str) -> Result<(), Error> {
+    pub async fn delete_blob(&self, blob_name: &str) -> Result<(), Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
         blob_client.delete().await?;
         info!("Successfully deleted blob {}", blob_name);

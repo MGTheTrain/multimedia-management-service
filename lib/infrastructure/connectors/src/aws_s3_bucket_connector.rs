@@ -28,7 +28,7 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes no parameters,
     /// and returns an AwsS3BucketConnector object
-    async fn new() -> Self {
+    pub async fn new() -> Self {
         let config = aws_config::load_from_env().await;
         AwsS3BucketConnector {
             storage_client: Some(Client::new(&config)),
@@ -39,7 +39,7 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes &self, the bucket name and a key as parameters,
     /// and returns an Result<GetObjectOutput, SdkError<GetObjectError>> object
-    async fn get_object(
+    pub async fn get_object(
         &self,
         bucket_name: &str,
         key: &str,
@@ -58,7 +58,7 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes &self, the bucket_name, the key (alias blob_name) and the file_name  as parameters,
     /// and returns an Result<PutObjectOutput, SdkError<PutObjectError>> object
-    async fn upload_blob(
+    pub async fn upload_blob(
         &self,
         bucket_name: &str,
         key: &str,
@@ -83,7 +83,7 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes &self, the bucket_name, the key and a file_path as parameters,
     /// and returns an Result<(), Error> object
-    async fn write_bytes_to_file(&self, bytes: &Bytes, file_path: &str) -> Result<(), io::Error> {
+    pub async fn write_bytes_to_file(&self, bytes: &Bytes, file_path: &str) -> Result<(), io::Error> {
         let mut file = fs::OpenOptions::new()
             .create(true) // To create a new file
             .write(true)
@@ -98,7 +98,7 @@ impl AwsS3BucketConnector {
     ///
     /// This method takes &self, the bucket_name and the key as parameters,
     /// and returns an Result<(), Error> object
-    async fn delete_blob(&self, bucket_name: &str, key: &str) -> Result<(), Error> {
+    pub async fn delete_blob(&self, bucket_name: &str, key: &str) -> Result<(), Error> {
         self.storage_client
             .as_ref()
             .unwrap()

@@ -25,14 +25,14 @@ impl PsqlDataAccess {
     /// Method for creating the PsqlDataAccess constructor
     ///
     /// Requires no parameters and returns and PsqlDataAccess object
-    fn new() -> Self {
+    pub fn new() -> Self {
         PsqlDataAccess {}
     }
 
     /// Method for inserting file_meta rows into a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, an in_file_meta as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
-    async fn insert_file_meta(
+    pub async fn insert_file_meta(
         &self,
         pg_connection: &mut AsyncPgConnection,
         in_file_meta: &models::file_meta::FileMeta,
@@ -54,7 +54,7 @@ impl PsqlDataAccess {
     /// Method for inserting container_meta rows into a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, an in_container_meta as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
-    async fn insert_container_meta(
+    pub async fn insert_container_meta(
         &self,
         pg_connection: &mut AsyncPgConnection,
         in_container_meta: &models::container_meta::ContainerMeta,
@@ -76,7 +76,7 @@ impl PsqlDataAccess {
     /// Method for retrieving a file_meta row by id from a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
-    async fn get_file_meta_by_id(
+    pub async fn get_file_meta_by_id(
         &self,
         pg_connection: &mut AsyncPgConnection,
         file_meta_id: &Uuid,
@@ -97,7 +97,7 @@ impl PsqlDataAccess {
     /// Method for retrieving a container_meta row by id from a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
-    async fn get_container_meta_by_id(
+    pub async fn get_container_meta_by_id(
         &self,
         pg_connection: &mut AsyncPgConnection,
         container_meta_id: &Uuid,
@@ -118,7 +118,7 @@ impl PsqlDataAccess {
     /// Method for updating a file_meta row by id in a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, a file_meta_id, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
-    async fn update_file_meta_by_id(
+    pub async fn update_file_meta_by_id(
         &self,
         pg_connection: &mut AsyncPgConnection,
         file_meta_id: &Uuid,
@@ -145,7 +145,7 @@ impl PsqlDataAccess {
     /// Method for updating a container_meta row by id in a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
-    async fn update_container_meta_by_id(
+    pub async fn update_container_meta_by_id(
         &self,
         pg_connection: &mut AsyncPgConnection,
         container_meta_id: &Uuid,
@@ -175,7 +175,7 @@ impl PsqlDataAccess {
     /// Method for deleting a file_meta row by id in a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, a file_meta_id, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
-    async fn delete_file_meta_by_id(
+    pub async fn delete_file_meta_by_id(
         &self,
         pg_connection: &mut AsyncPgConnection,
         file_meta_id: &Uuid,
@@ -192,7 +192,7 @@ impl PsqlDataAccess {
     /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
     ///
     /// Requires a pg_connection, a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
-    async fn delete_container_meta_by_id(
+    pub async fn delete_container_meta_by_id(
         &self,
         pg_connection: &mut AsyncPgConnection,
         container_meta_id: &Uuid,
