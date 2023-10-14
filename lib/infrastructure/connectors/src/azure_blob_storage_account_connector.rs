@@ -10,9 +10,6 @@ use bytes::Bytes;
 use log::info;
 
 pub struct AzureBlobStorageAccountConnector {
-    azure_access_key: Option<String>,
-    azure_account_name: Option<String>,
-    azure_container_name: Option<String>,
     container_client: Option<ContainerClient>,
 }
 
@@ -23,19 +20,16 @@ impl AzureBlobStorageAccountConnector {
     /// and returns an AzureBlobStorageAccountConnector object
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {    
         let azure_access_key =
-        std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY environment variable expected");
+            std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY environment variable expected");
         let azure_account_name =
             std::env::var("AZURE_ACCOUNT_NAME").expect("AZURE_ACCOUNT_NAME environment variable expected");
         let azure_container_name =
             std::env::var("AZURE_CONTAINER_NAME").expect("AZURE_CONTAINER_NAME environment variable expected");
-        let storage_credentials = StorageCredentials::access_key(account_name.clone(), access_key);
+        let storage_credentials = StorageCredentials::access_key(azure_account_name.clone(), azure_access_key);
         Ok(AzureBlobStorageAccountConnector {
-            azure_access_key: Some(String::from(azure_access_key)),
-            azure_account_name: Some(String::from(azure_account_name)),
-            azure_container_name: Some(String::from(azure_container_name)),
             container_client: Some(
-                ClientBuilder::new(account_name, storage_credentials)
-                    .container_client(container_name),
+                ClientBuilder::new(azure_account_name, storage_credentials)
+                    .container_client(azure_container_name),
             ),
         })
     }
@@ -119,7 +113,8 @@ mod tests {
         let env_file_path = "./assets/az-secrets.dev.cfg";
         dotenv::from_path(env_file_path).ok();
 
-        let azure_blob_storage_account_connector = Box::new(AzureBlobStorageAccountConnector::new());
+        let azure_blob_storage_account_connector = 
+            Box::new(AzureBlobStorageAccountConnector::new().unwrap());
 
         let upload_file_path = "./assets/sample.txt";
         let download_file_path = "./temp/sample-azure-copy.txt";
