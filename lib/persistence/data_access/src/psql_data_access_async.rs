@@ -4,7 +4,10 @@
 
 use diesel::prelude::*;
 use diesel_async::{RunQueryDsl, AsyncConnection, AsyncPgConnection};
-// use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+use diesel::{
+    Connection, PgConnection
+};
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use log::info;
 use models::enums::FileMetaType;
 use models::{
@@ -14,11 +17,9 @@ use models::{
 use uuid::Uuid;
 extern crate models;
 
-// pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
 
-pub struct PsqlDataAccess {
-    // pg_connection: Option<PgConnection>,
-}
+pub struct PsqlDataAccess {}
 
 impl PsqlDataAccess {
     /// Method for creating the PsqlDataAccess constructor
@@ -224,9 +225,11 @@ mod tests {
         let psql_data_access = Box::new(PsqlDataAccess::new());
         let mut pg_connection = AsyncPgConnection::establish(&database_url).await.unwrap();
 
-        // // migrations at compile time       
-        // info!("About to migrate datbase tables");
-        // pg_connection.run_pending_migrations(MIGRATIONS).await;
+        // migrations at compile time       
+        let mut migration_pg_connection = PgConnection::establish(&database_url).
+            unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+        info!("About to migrate datbase tables");
+        migration_pg_connection.run_pending_migrations(MIGRATIONS).unwrap();
 
         // file metainformation
         let mut file_meta_type = FileMetaType::Video;
