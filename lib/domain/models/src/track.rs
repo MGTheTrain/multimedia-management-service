@@ -83,19 +83,18 @@ impl Model for SubtitleTrack {
     }
 }
 
-// // future task: consider splitting into audio, video and subtitle tracks struct to gather more information
-// // See: https://github.com/alfg/mp4-rust/blob/master/examples/mp4info.rs
-// // command: cargo run --example mp4info  D:\videos\earth.mp4  
-// // File:
-// //   file size:          24406814
-// //   major_brand:        M4V
-// //   compatible_brands:  M4V  mp42 isom
-// // Movie:
-// //   version:        0
-// //   creation time:  1439235748
-// //   duration:       97.834s
-// //   fragments:      false
-// //   timescale:      90000
-// // Found 2 Tracks
-// //   Track: #2(eng) Audio: aac (LC) (mp4a / 0x6D703461), 48000 Hz, stereo, 157 kb/s
-// //   Track: #1(eng) Video: h264 (Baseline) (avc1 / 0x61766331), 1280x720, 1835 kb/s, 30.00 fps
+// See reference: https://github.com/alfg/mp4-rust/blob/master/examples/mp4info.rs
+// command: cargo run --example mp4info  D:\videos\earth.mp4  
+// File:
+//   file size:          24406814
+//   major_brand:        M4V
+//   compatible_brands:  M4V  mp42 isom
+// Movie:
+//   version:        0
+//   creation time:  1439235748
+//   duration:       97.834s
+//   fragments:      false
+//   timescale:      90000
+// Found 2 Tracks
+//   Track: #2(eng) Audio: aac (LC) (mp4a / 0x6D703461), 48000 Hz, stereo, 157 kb/s
+//   Track: #1(eng) Video: h264 (Baseline) (avc1 / 0x61766331), 1280x720, 1835 kb/s, 30.00 fps
