@@ -7,6 +7,7 @@ use diesel_async::{RunQueryDsl, AsyncConnection, AsyncPgConnection};
 use diesel::{
     Connection, PgConnection
 };
+use diesel_async::pooled_connection::{bb8::Pool, AsyncDieselConnectionManager};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use log::info;
 use models::enums::FileMetaType;
@@ -19,30 +20,35 @@ extern crate models;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
 
-pub struct PsqlDataAccess {}
+pub struct PsqlDataAccess {
+    pub connection_pool: bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
+}
 
 impl PsqlDataAccess {
-    /// Method for creating the PsqlDataAccess constructor
+/// Method for creating the PsqlDataAccess constructor
     ///
     /// Requires no parameters and returns and PsqlDataAccess object
-    pub fn new() -> Self {
-        PsqlDataAccess {}
+    pub async fn new(database_url: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
+        let connection_pool = Pool::builder().build(config).await.unwrap();
+        Ok(PsqlDataAccess {
+            connection_pool: connection_pool
+        })
     }
-
     /// Method for inserting file_meta rows into a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, an in_file_meta as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
+    /// Requires an in_file_meta as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
     pub async fn insert_file_meta(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         in_file_meta: &models::file_meta::FileMeta,
     ) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let result = diesel::insert_into(file_meta::table)
         .values(in_file_meta)
         .returning(models::file_meta::FileMeta::as_returning())
-        .get_result(pg_connection).await?;
+        .get_result(&mut pg_connection).await?;
         
         info!(
             "Successfully inserted file metainformation with file_meta_id {}",
@@ -53,18 +59,18 @@ impl PsqlDataAccess {
 
     /// Method for inserting container_meta rows into a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, an in_container_meta as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
+    /// Requires an in_container_meta as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn insert_container_meta(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         in_container_meta: &models::container_meta::ContainerMeta,
     ) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let result = diesel::insert_into(container_meta::table)
         .values(in_container_meta)
         .returning(models::container_meta::ContainerMeta::as_returning())
-        .get_result(pg_connection).await?;
+        .get_result(&mut pg_connection).await?;
 
         info!(
             "Successfully inserted container metainformation with container_meta_id {}",
@@ -75,17 +81,17 @@ impl PsqlDataAccess {
 
     /// Method for retrieving a file_meta row by id from a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
+    /// Requires an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
     pub async fn get_file_meta_by_id(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         file_meta_id: &Uuid,
     ) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let result = file_meta
             .filter(id.eq(file_meta_id))
-            .first::<models::file_meta::FileMeta>(pg_connection).await?;
+            .first::<models::file_meta::FileMeta>(&mut pg_connection).await?;
 
         info!(
             "Successfully retrieved file metainformation by file_meta_id {}",
@@ -99,14 +105,14 @@ impl PsqlDataAccess {
     /// Requires a pg_connection, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn get_container_meta_by_id(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         container_meta_id: &Uuid,
     ) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let result = container_meta
             .filter(id.eq(container_meta_id))
-            .first::<models::container_meta::ContainerMeta>(pg_connection).await?;
+            .first::<models::container_meta::ContainerMeta>(&mut pg_connection).await?;
 
         info!(
             "Successfully retrieved container metainformation by container_meta_id {}",
@@ -117,15 +123,15 @@ impl PsqlDataAccess {
 
     /// Method for updating a file_meta row by id in a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, a file_meta_id, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
+    /// Requires a file_meta_id, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
     pub async fn update_file_meta_by_id(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         file_meta_id: &Uuid,
         in_file_meta: &models::file_meta::FileMeta,
     ) -> Result<models::file_meta::FileMeta, diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let result = diesel::update(file_meta.filter(id.eq(file_meta_id)))
             .set((
                 name.eq(&in_file_meta.name),
@@ -133,7 +139,7 @@ impl PsqlDataAccess {
                 file_size_in_kb.eq(&in_file_meta.file_size_in_kb),
             ))
             .returning(models::file_meta::FileMeta::as_returning())
-            .get_result(pg_connection).await?;
+            .get_result(&mut pg_connection).await?;
 
         info!(
             "Successfully updated file metainformation by file_meta_id {}",
@@ -144,15 +150,15 @@ impl PsqlDataAccess {
 
     /// Method for updating a container_meta row by id in a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
+    /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn update_container_meta_by_id(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         container_meta_id: &Uuid,
         in_container_meta: &models::container_meta::ContainerMeta,
     ) -> Result<models::container_meta::ContainerMeta, diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let result = diesel::update(container_meta.filter(id.eq(container_meta_id)))
             .set((
                 date_time_created.eq(&in_container_meta.date_time_created),
@@ -163,7 +169,7 @@ impl PsqlDataAccess {
                 file_meta_ids.eq(&in_container_meta.file_meta_ids),
             ))
             .returning(models::container_meta::ContainerMeta::as_returning())
-            .get_result(pg_connection).await?;
+            .get_result(&mut pg_connection).await?;
 
         info!(
             "Successfully updated container metainformation by container_meta_id {}",
@@ -174,16 +180,16 @@ impl PsqlDataAccess {
 
     /// Method for deleting a file_meta row by id in a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, a file_meta_id, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
+    /// Requires a file_meta_id, an in_file_meta_id as parameters and returns a Result<models::file_meta::FileMeta, diesel::result::Error>
     pub async fn delete_file_meta_by_id(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         file_meta_id: &Uuid,
     ) -> Result<(), diesel::result::Error> {
         use models::schema::file_meta::dsl::*;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let rows_deleted =
-            diesel::delete(file_meta.filter(id.eq(file_meta_id))).execute(pg_connection).await?;
+            diesel::delete(file_meta.filter(id.eq(file_meta_id))).execute(&mut pg_connection).await?;
 
         info!("Successfully deleted {}", file_meta_id);
         Ok(())
@@ -191,16 +197,16 @@ impl PsqlDataAccess {
 
     /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
     ///
-    /// Requires a pg_connection, a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
+    /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn delete_container_meta_by_id(
         &self,
-        pg_connection: &mut AsyncPgConnection,
         container_meta_id: &Uuid,
     ) -> Result<(), diesel::result::Error> {
         use models::schema::container_meta::dsl::*;
 
+        let mut pg_connection = self.connection_pool.get().await.unwrap();
         let rows_deleted = diesel::delete(container_meta.filter(id.eq(container_meta_id)))
-            .execute(pg_connection).await?;
+            .execute(&mut pg_connection).await?;
 
         info!("Successfully deleted {}", container_meta_id);
         Ok(())
@@ -222,8 +228,7 @@ mod tests {
         dotenv::from_path(env_file_path).ok();
         
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
-        let psql_data_access = Box::new(PsqlDataAccess::new());
-        let mut pg_connection = AsyncPgConnection::establish(&database_url).await.unwrap();
+        let psql_data_access = Box::new(PsqlDataAccess::new(&database_url).await.unwrap());
 
         // migrations at compile time       
         let mut migration_pg_connection = PgConnection::establish(&database_url).
@@ -251,17 +256,17 @@ mod tests {
         });
 
         // [C]reate
-        let mut result = psql_data_access.insert_file_meta(&mut pg_connection, &video_file_meta).await;
+        let mut result = psql_data_access.insert_file_meta(&video_file_meta).await;
         assert!(result.is_ok());
-        result = psql_data_access.insert_file_meta(&mut pg_connection, &audio_file_meta).await;
+        result = psql_data_access.insert_file_meta(&audio_file_meta).await;
         assert!(result.is_ok());
 
         // [R]ead
-        result = psql_data_access.get_file_meta_by_id(&mut pg_connection, &video_file_meta.id).await;
+        result = psql_data_access.get_file_meta_by_id(&video_file_meta.id).await;
         assert!(result.is_ok());
         // assert_eq!(video_file_meta.name, result.as_ref().as_mut().name);
         // assert_eq!(video_file_meta.container_meta_id, &result.container_meta_id);
-        result = psql_data_access.get_file_meta_by_id(&mut pg_connection, &audio_file_meta.id).await;
+        result = psql_data_access.get_file_meta_by_id(&audio_file_meta.id).await;
         assert!(result.is_ok());
         // assert_eq!(audio_file_meta.name, &result.name);
         // assert_eq!(audio_file_meta.container_meta_id, &result.container_meta_id);
@@ -270,7 +275,6 @@ mod tests {
         video_file_meta.name = String::from("simple_updated_video.h264");
         video_file_meta.file_size_in_kb = 400000;
         result = psql_data_access.update_file_meta_by_id(
-            &mut pg_connection,
             &video_file_meta.id,
             &video_file_meta,
         ).await;
@@ -278,11 +282,11 @@ mod tests {
 
         // [D]elete
         let mut delete_result =
-            psql_data_access.delete_file_meta_by_id(&mut pg_connection, &video_file_meta.id).await;
+            psql_data_access.delete_file_meta_by_id(&video_file_meta.id).await;
         assert!(result.is_ok());
 
         delete_result =
-            psql_data_access.delete_file_meta_by_id(&mut pg_connection, &audio_file_meta.id).await;
+            psql_data_access.delete_file_meta_by_id(&audio_file_meta.id).await;
         assert!(result.is_ok());
         Ok(())
     }
