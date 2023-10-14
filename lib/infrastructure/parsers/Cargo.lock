@@ -332,6 +332,7 @@ dependencies = [
  "chrono",
  "dotenv",
  "env_logger",
+ "log",
  "models",
  "mp4",
  "uuid",
