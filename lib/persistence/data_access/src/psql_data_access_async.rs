@@ -137,8 +137,7 @@ impl PsqlDataAccess {
         let result = diesel::update(file_meta.filter(id.eq(file_meta_id)))
             .set((
                 name.eq(&in_file_meta.name),
-                file_type.eq(&in_file_meta.file_type),
-                file_size_in_kb.eq(&in_file_meta.file_size_in_kb),
+                file_type.eq(&in_file_meta.file_type)
             ))
             .returning(models::file_meta::FileMeta::as_returning())
             .get_result(&mut pg_connection).await?;
@@ -246,7 +245,6 @@ mod tests {
             container_meta_id: Uuid::new_v4(),
             name: String::from("simple_video.h264"),
             file_type: file_meta_type.to_i32(),
-            file_size_in_kb: 200000,
         };
 
         file_meta_type = FileMetaType::Audio;
@@ -255,7 +253,6 @@ mod tests {
             container_meta_id: Uuid::new_v4(),
             name: String::from("simple_audio.aac"),
             file_type: file_meta_type.to_i32(),
-            file_size_in_kb: 150000,
         });
 
         // [C]reate

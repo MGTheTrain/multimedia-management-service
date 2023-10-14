@@ -6,7 +6,6 @@ CREATE TABLE file_meta (
   container_meta_id UUID NOT NULL,
   name VARCHAR NOT NULL,
   file_type INTEGER NOT NULL,
-  file_size_in_kb BIGINT NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -19,5 +18,6 @@ CREATE TABLE container_meta (
   description VARCHAR NOT NULL,
   tags TEXT[] NOT NULL,
   file_meta_ids UUID[] NOT NULL,
+  file_size_in_kb BIGINT NOT NULL,
   PRIMARY KEY (id)
 );

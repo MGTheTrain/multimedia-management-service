@@ -146,7 +146,6 @@ impl PsqlDataAccess {
             .set((
                 name.eq(&in_file_meta.name),
                 file_type.eq(&in_file_meta.file_type),
-                file_size_in_kb.eq(&in_file_meta.file_size_in_kb),
             ))
             .returning(models::file_meta::FileMeta::as_returning())
             .get_result(&mut pg_connection)?;
@@ -249,7 +248,6 @@ mod tests {
             container_meta_id: Uuid::new_v4(),
             name: String::from("simple_video.h264"),
             file_type: file_meta_type.to_i32(),
-            file_size_in_kb: 200000,
         };
 
         file_meta_type = FileMetaType::Audio;
@@ -258,7 +256,6 @@ mod tests {
             container_meta_id: Uuid::new_v4(),
             name: String::from("simple_audio.aac"),
             file_type: file_meta_type.to_i32(),
-            file_size_in_kb: 150000,
         });
 
         // [C]reate
@@ -279,7 +276,6 @@ mod tests {
 
         // [U]pdate
         video_file_meta.name = String::from("simple_updated_video.h264");
-        video_file_meta.file_size_in_kb = 400000;
         result = psql_data_access.update_file_meta_by_id(
             &video_file_meta.id,
             &video_file_meta,

@@ -5,8 +5,6 @@ use crate::schema::container_meta;
 use crate::schema::file_meta;
 use uuid::Uuid;
 
-extern crate chrono;
-
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 
@@ -21,6 +19,7 @@ pub struct ContainerMeta {
     pub description: String,
     pub tags: Vec<Option<String>>,
     pub file_meta_ids: Vec<Option<Uuid>>,
+    pub file_size_in_kb: i64,
 }
 
 impl Model for ContainerMeta {
@@ -33,6 +32,7 @@ impl Model for ContainerMeta {
             description: String::from(""),
             tags: Vec::new(),
             file_meta_ids: Vec::new(),
+            file_size_in_kb: 0
         }
     }
 }
@@ -48,14 +48,12 @@ mod tests {
         video_file_meta.id = Uuid::new_v4();
         video_file_meta.name = String::from("simple_video.h264");
         video_file_meta.file_type = file_meta_type.to_i32();
-        video_file_meta.file_size_in_kb = 200000;
 
         file_meta_type = FileMetaType::Audio;
         let mut audio_file_meta = FileMeta::new();
         video_file_meta.id = Uuid::new_v4();
         audio_file_meta.name = String::from("simple_audio.aac");
         audio_file_meta.file_type = file_meta_type.to_i32();
-        audio_file_meta.file_size_in_kb = 150000;
 
         // --
         let current_date_time = Utc::now();
@@ -74,6 +72,7 @@ mod tests {
         container_meta.description = String::from("This is a sample container with video and audio to be stored in Youtube or Netflix shared container platform");
         container_meta.tags = tags;
         container_meta.file_meta_ids = file_meta_ids;
+        container_meta.file_size_in_kb = 100000;
 
         assert_eq!(container_meta.date_time_created, current_date_time);
         assert_eq!(container_meta.date_time_updated, current_date_time);
@@ -81,5 +80,6 @@ mod tests {
         assert_eq!(container_meta.description, "This is a sample container with video and audio to be stored in Youtube or Netflix shared container platform");
         assert_eq!(container_meta.tags.len(), 2);
         assert_eq!(container_meta.file_meta_ids.len(), 2);
+        assert_eq!(container_meta.file_size_in_kb, 100000);
     }
 }

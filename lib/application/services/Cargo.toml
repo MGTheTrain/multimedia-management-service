@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 connectors = { path = "../../infrastructure/connectors" }
 data_access = { path = "../../persistence/data_access" }
+models = { path = "../../domain/models" }
+uuid = { version = "1.4.1", features = [ "v4"]}
+chrono = "0.4"
