@@ -119,7 +119,7 @@ mod tests {
 
     // In order to run the test execute: `RUST_LOG=info cargo test`
     #[tokio::test]
-    async fn test_aws_s3_bucket_connector_methods() -> Result<(), Error> {
+    async fn test_aws_s3_bucket_connector_methods() -> Result<(), Box<dyn std::error::Error>> {
         env_logger::init();
 
         let env_file_path = "./assets/aws-secrets.dev.cfg";
@@ -127,15 +127,16 @@ mod tests {
 
         let aws_s3_bucket_connector = Box::new(AwsS3BucketConnector::new().await);
 
-        let bucket_name = "mg-test-bucket-v25";
+        let bucket_name =
+            std::env::var("AWS_BUCKET_NAME").expect("AWS_BUCKET_NAME not found in .cfg");
         let key = "sample.txt";
         let upload_file_path = "assets/sample.txt";
         let download_file_path = "temp/sample-aws-copy.txt";
         let upload_blob_result = aws_s3_bucket_connector
-            .upload_blob(bucket_name, key, upload_file_path)
+            .upload_blob(bucket_name.as_str(), key, upload_file_path)
             .await;
         assert!(upload_blob_result.is_ok());
-        let get_object_output = aws_s3_bucket_connector.get_object(bucket_name, key).await;
+        let get_object_output = aws_s3_bucket_connector.get_object(bucket_name.as_str(), key).await;
         assert!(get_object_output.is_ok());
         let bytes = get_object_output?
             .body
@@ -148,7 +149,7 @@ mod tests {
             .write_bytes_to_file(&bytes, download_file_path)
             .await;
         assert!(write_bytes_to_file_result.is_ok());
-        let delete_blob_result = aws_s3_bucket_connector.delete_blob(bucket_name, key).await;
+        let delete_blob_result = aws_s3_bucket_connector.delete_blob(bucket_name.as_str(), key).await;
         assert!(delete_blob_result.is_ok());
         Ok(())
     }
