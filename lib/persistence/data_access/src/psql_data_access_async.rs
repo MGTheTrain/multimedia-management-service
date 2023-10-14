@@ -23,7 +23,7 @@ pub struct PsqlDataAccess {
 }
 
 impl PsqlDataAccess {
-/// Method for creating the PsqlDataAccess constructor
+    /// Method for creating the PsqlDataAccess constructor
     ///
     /// Requires no parameters and returns and PsqlDataAccess object
     pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
