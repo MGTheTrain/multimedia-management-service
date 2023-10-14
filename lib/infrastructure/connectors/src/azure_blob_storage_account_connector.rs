@@ -19,9 +19,9 @@ pub struct AzureBlobStorageAccountConnector {
 impl AzureBlobStorageAccountConnector {
     /// Method new for constructing an object from the struct AzureBlobStorageAccountConnector
     ///
-    /// This method takes &self as a parameter,
+    /// This method takes no parameter,
     /// and returns an AzureBlobStorageAccountConnector object
-    pub fn new(&self) -> Result<Self, Box<dyn std::error::Error>> {    
+    pub fn new() -> Result<Self, Box<dyn std::error::Error>> {    
         let azure_access_key =
         std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY environment variable expected");
         let azure_account_name =
