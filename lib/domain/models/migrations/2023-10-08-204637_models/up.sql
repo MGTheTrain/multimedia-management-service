@@ -1,7 +1,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create the 'file_meta' table
-CREATE TABLE file_meta (
+-- Create the 'track' table
+CREATE TABLE track (
   id UUID DEFAULT uuid_generate_v4 (),
   container_meta_id UUID NOT NULL,
   name VARCHAR NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE container_meta (
   title VARCHAR NOT NULL,
   description VARCHAR NOT NULL,
   tags TEXT[] NOT NULL,
-  file_meta_ids UUID[] NOT NULL,
+  track_ids UUID[] NOT NULL,
   file_size_in_kb BIGINT NOT NULL,
   PRIMARY KEY (id)
 );

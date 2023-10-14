@@ -8,13 +8,13 @@ diesel::table! {
         title -> Varchar,
         description -> Varchar,
         tags -> Array<Nullable<Text>>,
-        file_meta_ids -> Array<Nullable<Uuid>>,
+        track_ids -> Array<Nullable<Uuid>>,
         file_size_in_kb -> Int8,
     }
 }
 
 diesel::table! {
-    file_meta (id) {
+    track (id) {
         id -> Uuid,
         container_meta_id -> Uuid,
         name -> Varchar,
@@ -24,5 +24,5 @@ diesel::table! {
 
 diesel::allow_tables_to_appear_in_same_query!(
     container_meta,
-    file_meta,
+    track,
 );

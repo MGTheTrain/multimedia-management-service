@@ -1,8 +1,8 @@
-use crate::enums::FileMetaType;
-use crate::file_meta::FileMeta;
+use crate::enums::TrackType;
+use crate::track::Track;
 use crate::model::Model;
 use crate::schema::container_meta;
-use crate::schema::file_meta;
+use crate::schema::track;
 use uuid::Uuid;
 
 use chrono::{DateTime, Utc};
@@ -18,7 +18,7 @@ pub struct ContainerMeta {
     pub title: String,
     pub description: String,
     pub tags: Vec<Option<String>>,
-    pub file_meta_ids: Vec<Option<Uuid>>,
+    pub track_ids: Vec<Option<Uuid>>,
     pub file_size_in_kb: i64,
 }
 
@@ -31,7 +31,7 @@ impl Model for ContainerMeta {
             title: String::from(""),
             description: String::from(""),
             tags: Vec::new(),
-            file_meta_ids: Vec::new(),
+            track_ids: Vec::new(),
             file_size_in_kb: 0
         }
     }
@@ -42,18 +42,18 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_file_meta() {
-        let mut file_meta_type = FileMetaType::Video;
-        let mut video_file_meta = FileMeta::new();
-        video_file_meta.id = Uuid::new_v4();
-        video_file_meta.name = String::from("simple_video.h264");
-        video_file_meta.file_type = file_meta_type.to_i32();
+    fn test_track() {
+        let mut track_type = TrackType::Video;
+        let mut video_track = Track::new();
+        video_track.id = Uuid::new_v4();
+        video_track.name = String::from("simple_video.h264");
+        video_track.file_type = track_type.to_i32();
 
-        file_meta_type = FileMetaType::Audio;
-        let mut audio_file_meta = FileMeta::new();
-        video_file_meta.id = Uuid::new_v4();
-        audio_file_meta.name = String::from("simple_audio.aac");
-        audio_file_meta.file_type = file_meta_type.to_i32();
+        track_type = TrackType::Audio;
+        let mut audio_track = Track::new();
+        video_track.id = Uuid::new_v4();
+        audio_track.name = String::from("simple_audio.aac");
+        audio_track.file_type = track_type.to_i32();
 
         // --
         let current_date_time = Utc::now();
@@ -61,8 +61,8 @@ mod tests {
             Some(String::from("entertainment")),
             Some(String::from("music")),
         ];
-        let file_meta_ids: Vec<Option<Uuid>> =
-            vec![Some(video_file_meta.id), Some(audio_file_meta.id)];
+        let track_ids: Vec<Option<Uuid>> =
+            vec![Some(video_track.id), Some(audio_track.id)];
 
         let mut container_meta = ContainerMeta::new();
         container_meta.id = Uuid::new_v4();
@@ -71,7 +71,7 @@ mod tests {
         container_meta.title = String::from("simple_container.mov");
         container_meta.description = String::from("This is a sample container with video and audio to be stored in Youtube or Netflix shared container platform");
         container_meta.tags = tags;
-        container_meta.file_meta_ids = file_meta_ids;
+        container_meta.track_ids = track_ids;
         container_meta.file_size_in_kb = 100000;
 
         assert_eq!(container_meta.date_time_created, current_date_time);
@@ -79,7 +79,7 @@ mod tests {
         assert_eq!(container_meta.title, String::from("simple_container.mov"));
         assert_eq!(container_meta.description, "This is a sample container with video and audio to be stored in Youtube or Netflix shared container platform");
         assert_eq!(container_meta.tags.len(), 2);
-        assert_eq!(container_meta.file_meta_ids.len(), 2);
+        assert_eq!(container_meta.track_ids.len(), 2);
         assert_eq!(container_meta.file_size_in_kb, 100000);
     }
 }

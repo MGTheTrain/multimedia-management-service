@@ -10,7 +10,7 @@ use crate::models;
 pub struct Mp4Parser {} 
 
 impl Mp4Parser {
-    fn info(filename: &str) -> Result<Vec<models::file_meta::FileMeta>, Box<dyn std::error::Error>> {
+    fn info(filename: &str) -> Result<Vec<models::track::Track>, Box<dyn std::error::Error>> {
         let f = File::open(filename)?;
         let size = f.metadata()?.len();
         let reader = BufReader::new(f);

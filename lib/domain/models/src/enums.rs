@@ -1,18 +1,18 @@
 #[derive(Debug, PartialEq)]
-pub enum FileMetaType {
+pub enum TrackType {
     Invalid,
     Video,
     Audio,
     Subtitle,
 }
 
-impl FileMetaType {
+impl TrackType {
     pub fn to_i32(&self) -> i32 {
         match self {
-            FileMetaType::Invalid => 0,
-            FileMetaType::Video => 1,
-            FileMetaType::Audio => 2,
-            FileMetaType::Subtitle => 3,
+            TrackType::Invalid => 0,
+            TrackType::Video => 1,
+            TrackType::Audio => 2,
+            TrackType::Subtitle => 3,
         }
     }
 }
