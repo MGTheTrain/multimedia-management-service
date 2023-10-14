@@ -1,6 +1,6 @@
 # Models
 
-## How to create diesel migrations
+## How to create manual diesel migrations
 
 **Precondition**: `export DATABASE_URL=postgres://user:password@localhost:5432/diesel-demo` in terminal process in which to also utilize `diesel` cli tool
 
@@ -11,3 +11,7 @@
 4. The `down.sql` will be applied on the targeted Sql database server trough `diesel migration redo`
 
 **NOTE**: Ensure updated `up.sql` and `down.sql` files for each migration are synced with `src/container_meta.rs`, `src/file_meta.rs` and `src/schema.rs`. Always check results in the `src/schema.rs` after executing `diesel migration run` or `diesel migration redo`. Check if results in the `src/schema.rs` align with the domain model structs defined in `src/container_meta.rs` or `src/file_meta.rs` (e.g. `cargo test` or trough `pre-compiler` red underlined lines in the code). 
+
+## Automatic diesel migrations in code at compile time
+
+The [psql_data_access_async.rs](../../persistence/data_access/src/psql_data_access_async.rs) and [psql_data_access.rs](../../persistence/data_access/src/psql_data_access.rs) shows in the tests how to migrate with the `run_pending_migrations(...)` method during compile time (e.g. `cargo build`). The previous section **How to create manual diesel migrations** is not necessary required.
