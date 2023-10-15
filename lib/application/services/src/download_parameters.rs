@@ -10,4 +10,8 @@ impl DownloadBlobParameters {
             file_name: String::from(""),
         }
     }
+
+    pub fn get_blob_name(&self) -> String {
+        String::from(&self.container_meta_id) + "/" + &self.file_name
+    }
 }

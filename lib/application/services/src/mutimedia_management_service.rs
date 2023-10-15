@@ -2,12 +2,13 @@ extern crate connectors;
 extern crate parsers;
 extern crate data_access;
 extern crate models;
+use log::info;
 use models::{schema::container_meta::date_time_created, model};
 use uuid::Uuid;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 
-use crate::{upload_parameters, download_parameters};
+use crate::{upload_parameters, download_parameters, delete_parameters::{self, DeleteBlobParameters}};
 
 struct MutimediaManagementService {
     pub blob_storage_connector: Option<connectors::aws_s3_bucket_connector::AwsS3BucketConnector>,
@@ -36,12 +37,13 @@ impl MutimediaManagementService {
         upload_blob_parameters: &upload_parameters::UploadBlobParameters,
         upload_meta_parameters: &upload_parameters::UploadMetaParameters) -> Result<models::container_meta::ContainerMeta, Box<dyn std::error::Error>> {
         
-        let mut container_meta_id = Uuid::new_v4(); // leading element
+        let container_meta_id = Uuid::new_v4(); // leading element
 
+        let updated_blob_name = container_meta_id.to_string() + "/" + &upload_blob_parameters.blob_name;
         self.blob_storage_connector
             .as_ref()
             .unwrap()
-            .upload_blob(&upload_blob_parameters.blob_name, &upload_blob_parameters.file_name)
+            .upload_blob(&updated_blob_name, &upload_blob_parameters.file_name)
             .await?;
         
         // Parse information from the MP4, MOV container and assign attributes to the tuple members `let (mut container_meta, ...) = ...`
@@ -52,6 +54,7 @@ impl MutimediaManagementService {
         if video_track != None {
             let mut video_track_unwrapped = video_track.unwrap(); 
             video_track_unwrapped.id = Uuid::new_v4();
+            video_track_unwrapped.container_meta_id = container_meta_id;
             self.sql_data_access
             .as_ref()
             .unwrap()
@@ -63,6 +66,7 @@ impl MutimediaManagementService {
         if audio_track != None {
             let mut audio_track_unwrapped = audio_track.unwrap(); 
             audio_track_unwrapped.id = Uuid::new_v4();
+            audio_track_unwrapped.container_meta_id = container_meta_id;
             self.sql_data_access
             .as_ref()
             .unwrap()
@@ -74,6 +78,7 @@ impl MutimediaManagementService {
         if subtitle_track != None {
             let mut subtitle_track_unwrapped = subtitle_track.unwrap(); 
             subtitle_track_unwrapped.id = Uuid::new_v4();
+            subtitle_track_unwrapped.container_meta_id = container_meta_id;
             self.sql_data_access
             .as_ref()
             .unwrap()
@@ -82,6 +87,7 @@ impl MutimediaManagementService {
         }
 
         // container (mp4, mov)
+        container_meta.id = container_meta_id;
         container_meta.title = container_meta.title;
         container_meta.description = container_meta.description;
         container_meta.date_time_created = Utc::now();
@@ -96,25 +102,21 @@ impl MutimediaManagementService {
         Ok(container_meta)
     }    
 
-    /// Method for downloading a blob from a blob storage
+    /// Method for retrieving bytes from blobs in a blob storage required for downloading 
     ///
     /// Requires the &self and download_blob_parameters as parameters and 
     /// returns a Result<Bytes, Box<dyn std::error::Error>>
-    pub async fn download_blob_by_name(&self, download_blob_parameters: &download_parameters::DownloadBlobParameters) 
+    pub async fn retrieve_bytes_from_blob_by_name(&self, download_blob_parameters: &download_parameters::DownloadBlobParameters) 
         -> Result<Bytes, Box<dyn std::error::Error>> {
-        let blob_name = String::from(&download_blob_parameters.container_meta_id) + 
-            "/" + &download_blob_parameters.file_name; // <077cd041-45be-4699-8f54-c5c42c8298a3>/<sample.txt>
         let get_object_output = 
-            self.blob_storage_connector.as_ref().unwrap().get_object(&blob_name).await?;
+            self.blob_storage_connector.as_ref().unwrap().get_object(
+                &download_blob_parameters.get_blob_name()).await?; // blob name example: <077cd041-45be-4699-8f54-c5c42c8298a3>/<sample.txt>
         let bytes = get_object_output
             .body
             .collect()
             .await
             .unwrap()
             .into_bytes(); 
-        // let write_bytes_to_file_result = self.blob_storage_connector.as_ref().unwrap()
-        //     .write_bytes_to_file(&bytes, download_file_path)
-        //     .await;
         Ok(bytes)
     }    
 
@@ -123,9 +125,13 @@ impl MutimediaManagementService {
     /// 
     /// Requires the &self, container_meta_id and file_name as parameters and 
     /// returns a Result<Bytes, Box<dyn std::error::Error>>
-    pub async fn delete_blob_and_created_metadata_by_id(&self, container_meta_id: &str) -> Result<(), Box<dyn std::error::Error>> {
-        self.blob_storage_connector.as_ref().unwrap().delete_blob(&container_meta_id).await?;
-        let uuid_from_str = Uuid::parse_str(container_meta_id).unwrap();
+    pub async fn delete_blob_and_created_metadata_by_id(&self, delete_blob_parameters: &DeleteBlobParameters) -> Result<(), Box<dyn std::error::Error>> {
+        let blob_name = delete_blob_parameters.get_blob_name();
+        info!("blob_name {} to be deleted", blob_name);
+        info!("blob folder {} to be deleted", delete_blob_parameters.container_meta_id);
+        self.blob_storage_connector.as_ref().unwrap().delete_blob(&delete_blob_parameters.get_blob_name()).await?; // delete blob
+        self.blob_storage_connector.as_ref().unwrap().delete_blob(&delete_blob_parameters.container_meta_id).await?; // delete folder
+        let uuid_from_str = Uuid::parse_str(&delete_blob_parameters.container_meta_id).unwrap();
 
         // retrieve container_meta by container metaid
         let container_meta = 
@@ -194,7 +200,9 @@ impl MutimediaManagementService {
 
 #[cfg(test)]
 mod tests {
-    use crate::upload_parameters::{UploadBlobParameters, UploadMetaParameters};
+    use models::schema::audio_track::container_meta_id;
+
+    use crate::{upload_parameters::{UploadBlobParameters, UploadMetaParameters}, download_parameters::DownloadBlobParameters, delete_parameters::DeleteBlobParameters};
 
     use super::*;
 
@@ -207,7 +215,7 @@ mod tests {
         dotenv::from_path(env_file_path).ok();
 
         let multi_media_management_service = MutimediaManagementService::new().await;
-        
+
         let mut upload_blob_parameters = UploadBlobParameters::new();
         upload_blob_parameters.blob_name = String::from("nature2.mp4");
         upload_blob_parameters.file_name = String::from("assets/nature2.mp4");
@@ -217,11 +225,53 @@ mod tests {
         upload_meta_parameters.description = String::from("A Sample MP4 container file");
         upload_meta_parameters.tags = vec![Some(String::from("nature")), Some(String::from("adventure"))];
         
-        let mut result = multi_media_management_service.upload_blob_and_create_metadata(&upload_blob_parameters, &upload_meta_parameters).await;
-        assert!(result.is_ok());
-        // // [C]reate
-        // let mut result = psql_data_access.insert_video_track(&video_track).await;
-        // assert!(result.is_ok());
+        // [C]reate
+        // Retrieve metadata
+        let create_result = multi_media_management_service.upload_blob_and_create_metadata(&upload_blob_parameters, &upload_meta_parameters).await;
+        assert!(create_result.is_ok());
+        let create_result_unwrapped = create_result.unwrap();
+
+        // [R]ead
+        let mut get_result = 
+            multi_media_management_service.retrieve_metadata_by_id::<models::container_meta::ContainerMeta>(&create_result_unwrapped.id).await;
+        assert!(get_result.is_ok());
+        // let conainer_meta = get_result.unwrap().unwrap() as models::container_meta::ContainerMeta;
+        get_result = 
+            multi_media_management_service.retrieve_metadata_by_id::<models::track::VideoTrack>(&create_result_unwrapped.video_track_id).await;
+        assert!(get_result.is_ok());
+
+        get_result = 
+            multi_media_management_service.retrieve_metadata_by_id::<models::track::AudioTrack>(&create_result_unwrapped.audio_track_id).await;
+        assert!(get_result.is_ok());
+
+        get_result = 
+            multi_media_management_service.retrieve_metadata_by_id::<models::track::SubtitleTrack>(&create_result_unwrapped.subtitle_track_id).await;
+        assert!(get_result.is_err());
+
+        // Download
+        let mut download_blob_parameters = DownloadBlobParameters::new();
+        download_blob_parameters.container_meta_id = create_result_unwrapped.id.to_string();
+        download_blob_parameters.file_name = upload_blob_parameters.blob_name;
+        let download_result = multi_media_management_service.retrieve_bytes_from_blob_by_name(&download_blob_parameters).await;
+        assert!(download_result.is_ok());
+        let bytes = download_result.unwrap();
+
+        assert!(bytes.len() > 0);
+        let download_file_path = "temp/nature2-copy.mp4";
+        let write_bytes_to_file_result = 
+            multi_media_management_service.blob_storage_connector.as_ref().unwrap()
+                .write_bytes_to_file(&bytes, download_file_path)
+                .await;
+        
+        // [U]pdate 
+        // TBD
+
+        // [D]elete
+        let mut delete_blob_parameters = DeleteBlobParameters::new();
+        delete_blob_parameters.container_meta_id = create_result_unwrapped.id.to_string();
+        delete_blob_parameters.file_name = download_blob_parameters.file_name;
+        let delete_result = multi_media_management_service.delete_blob_and_created_metadata_by_id(&delete_blob_parameters).await;
+        assert!(delete_result.is_ok());
 
         Ok(())
     }
