@@ -1,7 +1,7 @@
 use uuid::Uuid;
 
 pub struct UploadBlobParameters {
-    pub key: String,
+    pub blob_name: String,
     pub file_name: String,
 }
 pub struct UploadMetaParameters {

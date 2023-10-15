@@ -1,3 +1,4 @@
+use crate::model::Model;
 use crate::track::{VideoTrack, AudioTrack, SubtitleTrack};
 use crate::schema::container_meta;
 use crate::schema::video_track;
@@ -25,11 +26,11 @@ pub struct ContainerMeta {
     pub duration: f64,
 }
 
-impl ContainerMeta {
+impl Model for ContainerMeta {
     /// Method constructing a ContainerMeta object
     /// 
     /// Requires no paramters and returns a ContainerMeta object
-    pub fn new() -> Self {
+    fn new() -> Self {
         ContainerMeta {
             id: Uuid::nil(),
             date_time_created: Utc::now(),

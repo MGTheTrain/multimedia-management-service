@@ -1,3 +1,4 @@
+use crate::model::Model;
 use crate::schema::subtitle_track;
 use crate::schema::video_track;
 use crate::schema::audio_track;
@@ -18,11 +19,11 @@ pub struct VideoTrack {
     pub frame_rate: i32,
 }
 
-impl VideoTrack {
+impl Model for VideoTrack {
     /// Method constructing a VideoTrack object
     /// 
     /// Requires no paramters and returns a VideoTrack object
-    pub fn new() -> Self {
+    fn new() -> Self {
         VideoTrack {
             id: Uuid::nil(),
             container_meta_id: Uuid::nil(),
@@ -49,11 +50,11 @@ pub struct AudioTrack {
     pub sample_frequenz: i32, // in hz
 }
 
-impl AudioTrack {
+impl Model for AudioTrack {
     /// Method constructing a AudioTrack object
     /// 
     /// Requires no paramters and returns a AudioTrack object
-    pub fn new() -> Self {
+    fn new() -> Self {
         AudioTrack {
             id: Uuid::nil(),
             container_meta_id: Uuid::nil(),
@@ -76,11 +77,11 @@ pub struct SubtitleTrack {
     pub media_type: String,
 }
 
-impl SubtitleTrack {
+impl Model for SubtitleTrack {
     /// Method constructing a SubtitleTrack object
     /// 
     /// Requires no paramters and returns a SubtitleTrack object
-    pub fn new() -> Self {
+    fn new() -> Self {
         SubtitleTrack {
             id: Uuid::nil(),
             container_meta_id: Uuid::nil(),

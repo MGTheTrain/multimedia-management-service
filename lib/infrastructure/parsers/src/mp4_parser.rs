@@ -4,14 +4,14 @@ use std::io::prelude::*;
 use std::io::{self, BufReader};
 use std::path::Path;
 use chrono::{DateTime, Utc};
+use models::container_meta::ContainerMeta;
+use models::model::Model;
+use models::track::{VideoTrack, AudioTrack, SubtitleTrack};
 use uuid::Uuid;
 
 use log::info;
 use mp4::{Error, Mp4Track, TrackType};
-use models::{
-    container_meta::ContainerMeta,
-    track::{self, VideoTrack, AudioTrack, SubtitleTrack},
-};
+use models;
 
 pub struct Mp4Parser {} 
 
@@ -89,7 +89,7 @@ impl Mp4Parser {
     /// Requires the &self and the track as a parameter and returns a 
     /// Result<VideoTrack, Box<dyn std::error::Error>> object   
     fn get_video_info(&self, track: &Mp4Track) -> Result<VideoTrack, Box<dyn std::error::Error>> {
-        let mut video_track = VideoTrack::new();
+        let mut video_track = models::track::VideoTrack::new();
         video_track.media_type = track.media_type()?.to_string() as String;
         video_track.width = track.width() as i32;
         video_track.height = track.height() as i32;
@@ -154,6 +154,7 @@ impl Mp4Parser {
     /// Requires the &self and the track as a parameter and returns a 
     /// Result<SubtitleTrack, Box<dyn std::error::Error>> object   
     fn get_subtitle_info(&self, track: &Mp4Track) -> Result<SubtitleTrack, Box<dyn std::error::Error>> {
+        
         let mut subtitle_track = SubtitleTrack::new();
         subtitle_track.media_type = track.media_type()?.to_string() as String;        
 
