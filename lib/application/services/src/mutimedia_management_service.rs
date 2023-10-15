@@ -25,9 +25,10 @@ impl MutimediaManagementService {
         }
     }
 
-    /// Method for uploading blobs to a blob storage and inserting for the uploaded file track rows into a Psql database table utilizing diesel ORM
+    /// Method for uploading blobs to a blob storage and 
+    /// inserting metadata in Psql database tables
     ///
-    /// Requires a key, a file_name and returns a Result<models::track::Track, diesel::result::Error>
+    /// Requires upload_blob_parameters, upload_meta_parameters and returns a Result<(), Box<dyn std::error::Error>>
     async fn upload(        
         &self,
         upload_blob_parameters: &upload_parameters::UploadBlobParameters,
