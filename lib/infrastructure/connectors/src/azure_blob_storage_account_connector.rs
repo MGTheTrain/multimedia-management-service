@@ -8,6 +8,7 @@ use azure_storage::prelude::*;
 use azure_storage_blobs::prelude::*;
 use bytes::Bytes;
 use log::info;
+use uuid::Uuid;
 
 pub struct AzureBlobStorageAccountConnector {
     container_client: Option<ContainerClient>,
@@ -118,17 +119,18 @@ mod tests {
 
         let upload_file_path = "./assets/sample.txt";
         let download_file_path = "./temp/sample-azure-copy.txt";
-        let blob_name = "sample.txt";
+        let uuid = Uuid::new_v4();
+        let blob_name = uuid.to_string() + "/sample.txt";
         let upload_blob_result = azure_blob_storage_account_connector
-            .upload_blob(blob_name, upload_file_path)
-            .await;
+        .upload_blob(&blob_name, upload_file_path)
+        .await;
         assert!(upload_blob_result.is_ok());
         let download_blob_result = azure_blob_storage_account_connector
-            .download_blob(blob_name, download_file_path)
+            .download_blob(&blob_name, download_file_path)
             .await;
         assert!(download_blob_result.is_ok());
         let delete_blob_result = azure_blob_storage_account_connector
-            .delete_blob(blob_name)
+            .delete_blob(&blob_name)
             .await;
         assert!(delete_blob_result.is_ok());
         Ok(())
