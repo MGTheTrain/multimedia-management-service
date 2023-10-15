@@ -2,6 +2,7 @@ extern crate connectors;
 extern crate parsers;
 extern crate data_access;
 extern crate models;
+use core::slice::SlicePattern;
 use std::io::Cursor;
 
 use log::info;
@@ -111,7 +112,8 @@ impl MutimediaManagementService {
     /// Requires upload_file_parameters, upload_meta_parameters and returns a Result<models::container_meta::ContainerMeta, Box<dyn std::error::Error>>
     pub async fn upload_blob_from_bytes_and_create_metadata(        
         &self,
-        bytes: Vec<u8>,
+        byte_size: &u64,
+        bytes: &[u8],
         upload_file_parameters: &upload_parameters::UploadFileParameters,
         upload_meta_parameters: &upload_parameters::UploadMetaParameters) -> Result<models::container_meta::ContainerMeta, Box<dyn std::error::Error>> {
         
@@ -122,13 +124,13 @@ impl MutimediaManagementService {
         self.blob_storage_connector
             .as_ref()
             .unwrap()
-            .upload_bytes(&updated_blob_name, bytes)
+            .upload_bytes(&updated_blob_name, bytes.to_vec())
             .await?;
         
         // Parse information from the MP4, MOV container and assign attributes to the tuple members `let (mut container_meta, ...) = ...`
         let (mut container_meta, video_track, audio_track, subtitle_track) = 
             self.mp4_parser.as_ref().unwrap().parse_from_bytes(
-                &(bytes.len() as u64), &bytes).unwrap();
+                byte_size, bytes.as_ref()).unwrap();
 
         // video data (h264)
         if video_track != None {
