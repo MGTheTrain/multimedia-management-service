@@ -1,18 +1,19 @@
 use uuid::Uuid;
 
-pub struct UploadBlobParameters {
+pub struct UploadFileParameters {
     pub blob_name: String,
     pub file_name: String,
 }
 
-impl UploadBlobParameters {
+impl UploadFileParameters {
     pub fn new() -> Self {
-        UploadBlobParameters {
+        UploadFileParameters {
             blob_name: String::from(""),
             file_name: String::from(""),
         }
     }
 }
+
 pub struct UploadMetaParameters {
     pub title: String,
     pub description: String,

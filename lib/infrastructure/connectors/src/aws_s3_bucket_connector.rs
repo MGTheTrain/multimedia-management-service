@@ -87,6 +87,30 @@ impl AwsS3BucketConnector {
         put_object_output
     }
 
+    /// Async method for uploading blobs to an AWS S3 Bucket
+    ///
+    /// This method takes &self, the blob_name and the bytes as parameters,
+    /// and returns an Result<PutObjectOutput, SdkError<PutObjectError>> object
+    pub async fn upload_bytes(
+        &self,
+        blob_name: &str,
+        bytes: &'static[u8],
+    ) -> Result<PutObjectOutput, SdkError<PutObjectError>> {
+        let body = ByteStream::from_static(bytes);
+        let put_object_output = self
+            .storage_client
+            .as_ref()
+            .unwrap()
+            .put_object()
+            .bucket(self.bucket_name.as_ref().unwrap())
+            .key(blob_name)
+            .body(body)
+            .send()
+            .await;
+        info!("Successfully uploaded blob {}", blob_name);
+        put_object_output
+    }
+
     /// Async method for writing the blobs content/bytes from an AWS S3 Bucket to a file
     ///
     /// This method takes &self, the bytes and a file_path as parameters,
