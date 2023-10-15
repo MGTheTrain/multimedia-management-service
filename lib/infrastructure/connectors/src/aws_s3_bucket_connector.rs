@@ -154,9 +154,9 @@ mod tests {
         let write_bytes_to_file_result = aws_s3_bucket_connector
             .write_bytes_to_file(&bytes, download_file_path)
             .await;
-        // assert!(write_bytes_to_file_result.is_ok());
-        // let delete_blob_result = aws_s3_bucket_connector.delete_blob(&key).await;
-        // assert!(delete_blob_result.is_ok());
+        assert!(write_bytes_to_file_result.is_ok());
+        let delete_blob_result = aws_s3_bucket_connector.delete_blob(&key).await;
+        assert!(delete_blob_result.is_ok());
         Ok(())
     }
 }
