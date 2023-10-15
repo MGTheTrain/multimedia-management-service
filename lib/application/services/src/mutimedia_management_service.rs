@@ -31,7 +31,7 @@ impl MutimediaManagementService {
     /// Method for uploading blobs to a blob storage and 
     /// inserting metadata to relational database table rows
     ///
-    /// Requires upload_blob_parameters, upload_meta_parameters and returns a Result<(), Box<dyn std::error::Error>>
+    /// Requires upload_blob_parameters, upload_meta_parameters and returns a Result<models::container_meta::ContainerMeta, Box<dyn std::error::Error>>
     pub async fn upload_blob_and_create_metadata(        
         &self,
         upload_blob_parameters: &upload_parameters::UploadBlobParameters,
@@ -121,10 +121,10 @@ impl MutimediaManagementService {
     }    
 
     /// Method for deleting blobs from a blob storage and 
-    /// deleting metadata inserted into relational database table rows by container_meta_id
+    /// deleting metadata inserted into relational database table rows by id
     /// 
-    /// Requires the &self, container_meta_id and file_name as parameters and 
-    /// returns a Result<Bytes, Box<dyn std::error::Error>>
+    /// Requires the &self, delete_blob_parameters and file_name as parameters and 
+    /// returns a Result<(), Box<dyn std::error::Error>>
     pub async fn delete_blob_and_created_metadata_by_id(&self, delete_blob_parameters: &DeleteBlobParameters) -> Result<(), Box<dyn std::error::Error>> {
         let blob_name = delete_blob_parameters.get_blob_name();
         info!("blob_name {} to be deleted", blob_name);
@@ -149,7 +149,54 @@ impl MutimediaManagementService {
 
         self.sql_data_access.as_ref().unwrap().delete_container_meta_by_id(&uuid_from_str).await?;
         Ok(())
-    }    
+    }
+
+    // /// [TOO COMPLEX] Method for updating metadata inserted into relational database table rows by id
+    // /// 
+    // /// Requires the &self, id and model_type as parameters and 
+    // /// returns a Result<Option<models::ModelType>, Box<dyn std::error::Error>>
+    // pub async fn update_metadata_by_id(&self, id: &Uuid, model_type: &models::ModelType) -> Result<Option<models::ModelType>, Box<dyn std::error::Error>>
+    // {
+    //     match model_type {
+    //         models::ModelType::ContainerMeta(container_meta) => {
+    //             let model = self.sql_data_access
+    //                 .as_ref()
+    //                 .unwrap()
+    //                 .update_container_meta_by_id(&id, container_meta)
+    //                 .await?;
+    //             Ok(Some(models::ModelType::ContainerMeta(model)))
+    //         }
+    //         models::ModelType::VideoTrack(video_track) => {
+    //             let model = self.sql_data_access
+    //                 .as_ref()
+    //                 .unwrap()
+    //                 .update_video_track_by_id(&id, video_track)
+    //                 .await?;
+    //             Ok(Some(models::ModelType::VideoTrack(model)))
+    //         }
+    //         models::ModelType::AudioTrack(audio_track) => {
+    //             let model = self.sql_data_access
+    //                 .as_ref()
+    //                 .unwrap()
+    //                 .update_audio_track_by_id(&id, audio_track)
+    //                 .await?;
+    //             Ok(Some(models::ModelType::AudioTrack(model)))
+    //         }
+    //         models::ModelType::SubtitleTrack(subtitle_track) => {
+    //             let model = self.sql_data_access
+    //                 .as_ref()
+    //                 .unwrap()
+    //                 .update_subtitle_track_by_id(&id, subtitle_track)
+    //                 .await?;
+    //             Ok(Some(models::ModelType::SubtitleTrack(model)))
+    //         }
+    //         _ => {
+    //             // Handle any other unhandled variants (catch-all)
+    //             println!("Received an unknown variant");
+    //             Ok(None)
+    //         }
+    //     }
+    // }
 
     /// Method for retrieving metadata inserted into relational database table rows by id
     /// 
@@ -200,7 +247,7 @@ impl MutimediaManagementService {
 
 #[cfg(test)]
 mod tests {
-    use models::schema::audio_track::container_meta_id;
+    use models::{schema::{audio_track::container_meta_id, subtitle_track}, container_meta::ContainerMeta, model::Model};
 
     use crate::{upload_parameters::{UploadBlobParameters, UploadMetaParameters}, download_parameters::DownloadBlobParameters, delete_parameters::DeleteBlobParameters};
 
@@ -232,21 +279,22 @@ mod tests {
         let create_result_unwrapped = create_result.unwrap();
 
         // [R]ead
-        let mut get_result = 
+        let mut get_container_meta_result = 
             multi_media_management_service.retrieve_metadata_by_id::<models::container_meta::ContainerMeta>(&create_result_unwrapped.id).await;
-        assert!(get_result.is_ok());
+        assert!(get_container_meta_result.is_ok());
         // let conainer_meta = get_result.unwrap().unwrap() as models::container_meta::ContainerMeta;
-        get_result = 
+        let mut get_video_track_result = 
             multi_media_management_service.retrieve_metadata_by_id::<models::track::VideoTrack>(&create_result_unwrapped.video_track_id).await;
-        assert!(get_result.is_ok());
+        assert!(get_video_track_result.is_ok());
+        let get_video_track_result_unwrapped = get_video_track_result.unwrap(); 
 
-        get_result = 
+        let mut get_audio_track_result = 
             multi_media_management_service.retrieve_metadata_by_id::<models::track::AudioTrack>(&create_result_unwrapped.audio_track_id).await;
-        assert!(get_result.is_ok());
+        assert!(get_audio_track_result.is_ok());
 
-        get_result = 
+        let mut get_subtitle_track_result =  
             multi_media_management_service.retrieve_metadata_by_id::<models::track::SubtitleTrack>(&create_result_unwrapped.subtitle_track_id).await;
-        assert!(get_result.is_err());
+        assert!(get_subtitle_track_result.is_err());
 
         // Download
         let mut download_blob_parameters = DownloadBlobParameters::new();
@@ -263,15 +311,39 @@ mod tests {
                 .write_bytes_to_file(&bytes, download_file_path)
                 .await;
         
-        // [U]pdate 
-        // TBD
+        // [U]pdate
+        let get_container_meta_result_unwrapped = get_container_meta_result.unwrap().unwrap();
+        match get_container_meta_result_unwrapped {
+            models::ModelType::ContainerMeta(container_meta) => {
+            }
+            models::ModelType::VideoTrack(video_track) => {
+                let mut updated_video_track = models::track::VideoTrack::new();
 
-        // [D]elete
-        let mut delete_blob_parameters = DeleteBlobParameters::new();
-        delete_blob_parameters.container_meta_id = create_result_unwrapped.id.to_string();
-        delete_blob_parameters.file_name = download_blob_parameters.file_name;
-        let delete_result = multi_media_management_service.delete_blob_and_created_metadata_by_id(&delete_blob_parameters).await;
-        assert!(delete_result.is_ok());
+                updated_video_track = updated_video_track; 
+                updated_video_track.width = 1290;
+                
+                let multi_media_management_service_sql_data_access_unwrapped = multi_media_management_service.sql_data_access.unwrap();
+                let update_result = multi_media_management_service_sql_data_access_unwrapped
+                .update_video_track_by_id(&create_result_unwrapped.video_track_id, &updated_video_track).await;
+
+                assert!(update_result.is_ok());
+            }
+            models::ModelType::AudioTrack(audio_track) => {
+                // Handle AudioTrack
+            }
+            models::ModelType::SubtitleTrack(subtitle_track) => {
+                // Handle SubtitleTrack
+            }
+            _ => {
+                println!("Received an unknown variant");
+            }
+        }
+        // // [D]elete
+        // let mut delete_blob_parameters = DeleteBlobParameters::new();
+        // delete_blob_parameters.container_meta_id = create_result_unwrapped.id.to_string();
+        // delete_blob_parameters.file_name = download_blob_parameters.file_name;
+        // let delete_result = multi_media_management_service.delete_blob_and_created_metadata_by_id(&delete_blob_parameters).await;
+        // assert!(delete_result.is_ok());
 
         Ok(())
     }
