@@ -338,12 +338,12 @@ mod tests {
                 println!("Received an unknown variant");
             }
         }
-        // // [D]elete
-        // let mut delete_blob_parameters = DeleteBlobParameters::new();
-        // delete_blob_parameters.container_meta_id = create_result_unwrapped.id.to_string();
-        // delete_blob_parameters.file_name = download_blob_parameters.file_name;
-        // let delete_result = multi_media_management_service.delete_blob_and_created_metadata_by_id(&delete_blob_parameters).await;
-        // assert!(delete_result.is_ok());
+        // [D]elete
+        let mut delete_blob_parameters = DeleteBlobParameters::new();
+        delete_blob_parameters.container_meta_id = create_result_unwrapped.id.to_string();
+        delete_blob_parameters.file_name = download_blob_parameters.file_name;
+        let delete_result = multi_media_management_service.delete_blob_and_created_metadata_by_id(&delete_blob_parameters).await;
+        assert!(delete_result.is_ok());
 
         Ok(())
     }
