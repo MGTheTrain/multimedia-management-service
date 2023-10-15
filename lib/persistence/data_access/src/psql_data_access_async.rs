@@ -31,6 +31,14 @@ impl PsqlDataAccess {
         let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
         let connection_pool = Pool::builder().build(config).await.unwrap();
 
+        // migrations at compile time     
+        // NOTE: workaround for async_diesel     
+        let migration_database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
+        let mut migration_pg_connection = PgConnection::establish(&migration_database_url).
+            unwrap_or_else(|_| panic!("Error connecting to {}", migration_database_url));
+        info!("About to migrate datbase tables");
+        migration_pg_connection.run_pending_migrations(MIGRATIONS).unwrap();
+
         Ok(PsqlDataAccess {
             connection_pool: connection_pool
         })
@@ -411,14 +419,6 @@ mod tests {
         dotenv::from_path(env_file_path).ok();
         
         let psql_data_access = Box::new(PsqlDataAccess::new().await.unwrap());
-        
-        // migrations at compile time     
-        // NOTE: workaround for async_diesel     
-        let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
-        let mut migration_pg_connection = PgConnection::establish(&database_url).
-            unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
-        info!("About to migrate datbase tables");
-        migration_pg_connection.run_pending_migrations(MIGRATIONS).unwrap();
 
         // file metainformation
         let mut video_track = VideoTrack {
