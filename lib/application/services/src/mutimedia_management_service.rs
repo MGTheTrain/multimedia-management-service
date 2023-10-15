@@ -2,12 +2,13 @@ extern crate connectors;
 extern crate parsers;
 extern crate data_access;
 extern crate models;
-use models::{schema::container_meta::date_time_created};
+use models::{schema::container_meta::date_time_created, model};
 use uuid::Uuid;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 
 use crate::{upload_parameters, download_parameters};
+
 struct MutimediaManagementService {
     pub blob_storage_connector: Option<connectors::aws_s3_bucket_connector::AwsS3BucketConnector>,
     pub mp4_parser: Option<parsers::mp4_parser::Mp4Parser>,
@@ -147,35 +148,45 @@ impl MutimediaManagementService {
     /// Method for retrieving metadata inserted into relational database table rows by id
     /// 
     /// Requires the &self, id and file_name as parameters and 
-    /// returns a Result<Bytes, Box<dyn std::error::Error>>
-    async fn retrieve_metadata_by_id<T>(&self, id: &Uuid) -> Result<Option<T>, Box<dyn std::error::Error>> 
-        where T: models::model::Model {
-        if(std::any::type_name::<T>() == std::any::type_name::<models::container_meta::ContainerMeta>()) {
-            let result = self.sql_data_access
-            .as_ref()
-            .unwrap()
-            .get_container_meta_by_id(&id).await?;
-            Ok(Some(result))
+    /// returns a Result<Option<models::ModelType>, Box<dyn std::error::Error>>
+    async fn retrieve_metadata_by_id<T>(&self, id: &Uuid) -> Result<Option<models::ModelType>, Box<dyn std::error::Error>>
+    where
+        T: models::model::Model,
+    {
+        if std::any::type_name::<T>() == std::any::type_name::<models::container_meta::ContainerMeta>() {
+            let model = self.sql_data_access
+                .as_ref()
+                .unwrap()
+                .get_container_meta_by_id(&id)
+                .await?;
+            Ok(Some(models::ModelType::ContainerMeta(model)))
+        } else if std::any::type_name::<T>() == std::any::type_name::<models::track::VideoTrack>() {
+            let model = self.sql_data_access
+                .as_ref()
+                .unwrap()
+                .get_video_track_by_id(&id)
+                .await?;
+            Ok(Some(models::ModelType::VideoTrack(model)))
+        } else if std::any::type_name::<T>() == std::any::type_name::<models::track::AudioTrack>() {
+            let model = self.sql_data_access
+                .as_ref()
+                .unwrap()
+                .get_audio_track_by_id(&id)
+                .await?;
+            Ok(Some(models::ModelType::AudioTrack(model)))
+        } else if std::any::type_name::<T>() == std::any::type_name::<models::track::SubtitleTrack>() {
+            let model = self.sql_data_access
+                .as_ref()
+                .unwrap()
+                .get_subtitle_track_by_id(&id)
+                .await?;
+            Ok(Some(models::ModelType::SubtitleTrack(model)))
+        } 
+        // Add similar branches for other model types
+        else {
+            Err("Unknown model type".into())
+            Ok(None)
         }
-        else if(std::any::type_name::<T>() == std::any::type_name::<models::track::VideoTrack>()) {
-            self.sql_data_access
-            .as_ref()
-            .unwrap()
-            .get_video_track_by_id(&id).await?;
-        } 
-        else if(std::any::type_name::<T>() == std::any::type_name::<models::track::AudioTrack>()) {
-            self.sql_data_access
-            .as_ref()
-            .unwrap()
-            .get_audio_track_by_id(&id).await?;
-        } 
-        else if(std::any::type_name::<T>() == std::any::type_name::<models::track::SubtitleTrack>()) {
-            self.sql_data_access
-            .as_ref()
-            .unwrap()
-            .get_subtitle_track_by_id(&id).await?;
-        } 
-
-        Ok(None)
     }
+
 }
