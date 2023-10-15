@@ -1,6 +1,6 @@
 use std::env;
 use std::fs::File;
-use std::io::prelude::*;
+use std::io::{prelude::*, Cursor};
 use std::io::{self, BufReader};
 use std::path::Path;
 use chrono::{DateTime, Utc};
@@ -23,18 +23,22 @@ impl Mp4Parser {
         Mp4Parser {}
     }
 
-    /// Method for retrieving MP4 file info
+    /// Method for retrieving MP4 file info and setting it in returned tuple
     ///
     /// Requires the &self and the filename as a parameter and returns a 
     /// Result<(ContainerMeta, Option<VideoTrack>, Option<AudioTrack>, Option<SubtitleTrack>), Box<dyn std::error::Error>>
-    pub fn parse(&self, filename: &str) -> 
+    pub fn parse_from_file(&self, filename: &str) -> 
     Result<(ContainerMeta, Option<VideoTrack>, Option<AudioTrack>, Option<SubtitleTrack>), Box<dyn std::error::Error>> {
         let f = File::open(filename)?;
         let size = f.metadata()?.len();
         let reader = BufReader::new(f);
-    
-        let mp4 = mp4::Mp4Reader::read_header(reader, size)?;
-    
+
+        // let bytes: &[u8] = b"Hello, world!"; 
+        // let cursor = Cursor::new(bytes);
+        // let mut reader = BufReader::new(cursor);
+
+        let mp4:mp4::Mp4Reader<BufReader<File>>  = mp4::Mp4Reader::read_header(reader, size)?;
+
         let mut container_meta = ContainerMeta::new();
     
         container_meta.id = Uuid::new_v4();
@@ -78,11 +82,73 @@ impl Mp4Parser {
                 }
             };
         }
-    
-        info!("Successfull parsed filename {}", filename );
+        
+        info!("Successfull parsed MP4 filename {}", filename ); 
         Ok((container_meta, video_track, audio_track, subtitle_track))
     }
+
+
+    /// Method for retrieving MP4 file info and setting it in returned tuple
+    ///
+    /// Requires the &self, the byte size and the bytes as a parameter and returns a 
+    /// Result<(ContainerMeta, Option<VideoTrack>, Option<AudioTrack>, Option<SubtitleTrack>), Box<dyn std::error::Error>>
+    pub fn parse_from_bytes(&self, byte_size: &u64, bytes: &[u8]) -> 
+    Result<(ContainerMeta, Option<VideoTrack>, Option<AudioTrack>, Option<SubtitleTrack>), Box<dyn std::error::Error>> {
+
+        // let bytes: &[u8] = b"Hello, world!"; 
+        let cursor = Cursor::new(bytes);
+        let mut reader = BufReader::new(cursor);
+
+        let mp4: mp4::Mp4Reader<BufReader<Cursor<&[u8]>>> = mp4::Mp4Reader::read_header(reader, *byte_size)?;
+
+        let mut container_meta = ContainerMeta::new();
     
+        container_meta.id = Uuid::new_v4();
+        container_meta.date_time_created = Utc::now();
+        container_meta.date_time_updated = container_meta.date_time_created;
+        container_meta.file_size_in_kb = mp4.size() as i64;
+        container_meta.duration = mp4.duration().as_secs() as f64;
+        // container_meta title, description and tags need to be set
+
+        // info!("File:");
+        // info!("  file size:          {}", mp4.size());
+        // info!("  major_brand:        {}", mp4.major_brand());
+    
+        let mut video_track: Option<VideoTrack> = None;
+        let mut audio_track: Option<AudioTrack> = None;
+        let mut subtitle_track: Option<SubtitleTrack> = None;
+    
+        // Tracks
+        for track in mp4.tracks().values() {
+            let media_info = match track.track_type()? {
+                TrackType::Video => {
+                    let track_id = Uuid::new_v4();
+                    let mut video_info = self.get_video_info(track).unwrap();
+                    video_info.id = track_id;
+                    container_meta.video_track_id = track_id;
+                    video_track = Some(video_info);
+                },
+                TrackType::Audio => {
+                    let track_id = Uuid::new_v4();
+                    let mut audio_info = self.get_audio_info(track).unwrap();
+                    audio_info.id = track_id;
+                    container_meta.audio_track_id = track_id;
+                    audio_track = Some(audio_info);
+                },
+                TrackType::Subtitle => {
+                    let track_id = Uuid::new_v4();
+                    let mut subtitle_info = self.get_subtitle_info(track).unwrap();
+                    subtitle_info.id = track_id;
+                    container_meta.subtitle_track_id = track_id;
+                    subtitle_track = Some(subtitle_info);
+                }
+            };
+        }
+        
+        info!("Successfull parsed MP4 bytestream"); 
+        Ok((container_meta, video_track, audio_track, subtitle_track))
+    }
+
 
     /// Helper method for the video section of the MP4 file if available
     ///
@@ -172,7 +238,8 @@ mod tests {
     fn test_mp4_parser() {
         env_logger::init();
         let mp4_parser = Mp4Parser::new();
-        let (container_meta, video_track, audio_track, subtitle_track) = mp4_parser.parse("assets/nature2.mp4").unwrap();
+        let (container_meta, video_track, audio_track, subtitle_track) = 
+            mp4_parser.parse_from_file("assets/nature2.mp4").unwrap();
         assert_eq!(container_meta.file_size_in_kb, 5862561);
         // assert_eq!(container_meta.duration,);
         let video_track_unwrapped = video_track.unwrap(); 
