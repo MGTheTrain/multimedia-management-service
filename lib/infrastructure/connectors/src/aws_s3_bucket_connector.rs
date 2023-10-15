@@ -94,9 +94,9 @@ impl AwsS3BucketConnector {
     pub async fn upload_bytes(
         &self,
         blob_name: &str,
-        bytes: &'static[u8],
+        bytes: Vec<u8>,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>> {
-        let body = ByteStream::from_static(bytes);
+        let body = ByteStream::from(bytes);
         let put_object_output = self
             .storage_client
             .as_ref()
