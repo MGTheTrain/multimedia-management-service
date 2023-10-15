@@ -47,29 +47,29 @@ impl AwsS3BucketConnector {
 
     /// Private method for returning a blob client
     ///
-    /// This method takes &self, the bucket name and a key as parameters,
+    /// This method takes &self, the blob_name and a blob_name as parameters,
     /// and returns an Result<GetObjectOutput, SdkError<GetObjectError>> object
     pub async fn get_object(
         &self,
-        key: &str,
+        blob_name: &str,
     ) -> Result<GetObjectOutput, SdkError<GetObjectError>> {
         self.storage_client
             .as_ref()
             .unwrap()
             .get_object()
             .bucket(self.bucket_name.as_ref().unwrap())
-            .key(key)
+            .key(blob_name)
             .send()
             .await
     }
 
     /// Async method for uploading blobs to an AWS S3 Bucket
     ///
-    /// This method takes &self, the bucket_name, the key (alias blob_name) and the file_name  as parameters,
+    /// This method takes &self, the blob_name and the file_name  as parameters,
     /// and returns an Result<PutObjectOutput, SdkError<PutObjectError>> object
     pub async fn upload_blob(
         &self,
-        key: &str,
+        blob_name: &str,
         file_name: &str,
     ) -> Result<PutObjectOutput, SdkError<PutObjectError>> {
         let body = ByteStream::from_path(Path::new(file_name)).await;
@@ -79,18 +79,18 @@ impl AwsS3BucketConnector {
             .unwrap()
             .put_object()
             .bucket(self.bucket_name.as_ref().unwrap())
-            .key(key)
+            .key(blob_name)
             .body(body.unwrap())
             .send()
             .await;
-        info!("Successfully uploaded blob {}", key);
+        info!("Successfully uploaded blob {}", blob_name);
         put_object_output
     }
 
     /// Async method for writing the blobs content/bytes from an AWS S3 Bucket to a file
     ///
-    /// This method takes &self, the bucket_name, the key and a file_path as parameters,
-    /// and returns an Result<(), Error> object
+    /// This method takes &self, the bytes and a file_path as parameters,
+    /// and returns a Result<(), io::Error> object
     pub async fn write_bytes_to_file(&self, bytes: &Bytes, file_path: &str) -> Result<(), io::Error> {
         let mut file = fs::OpenOptions::new()
             .create(true) // To create a new file
@@ -104,19 +104,19 @@ impl AwsS3BucketConnector {
 
     /// Async method for deleting blobs from an AWS S3 Bucket
     ///
-    /// This method takes &self and the key as parameters,
+    /// This method takes &self and the blob_name as parameters,
     /// and returns an Result<(), Error> object
-    pub async fn delete_blob(&self, key: &str) -> Result<(), Error> {
+    pub async fn delete_blob(&self, blob_name: &str) -> Result<(), Error> {
         self.storage_client
             .as_ref()
             .unwrap()
             .delete_object()
             .bucket(self.bucket_name.as_ref().unwrap())
-            .key(key)
+            .key(blob_name)
             .send()
             .await?;
 
-        info!("Successfully deleted blob {}", key);
+        info!("Successfully deleted blob {}", blob_name);
         Ok(())
     }
 }
@@ -137,12 +137,12 @@ mod tests {
         let upload_file_path = "assets/sample.txt";
         let download_file_path = "temp/sample-aws-copy.txt";
         let uuid = Uuid::new_v4();
-        let key = uuid.to_string() + "/sample.txt";
+        let blob_name = uuid.to_string() + "/sample.txt";
         let upload_blob_result = aws_s3_bucket_connector
-            .upload_blob(&key, upload_file_path)
+            .upload_blob(&blob_name, upload_file_path)
             .await;
         assert!(upload_blob_result.is_ok());
-        let get_object_output = aws_s3_bucket_connector.get_object(&key).await;
+        let get_object_output = aws_s3_bucket_connector.get_object(&blob_name).await;
         assert!(get_object_output.is_ok());
         let bytes = get_object_output?
             .body
@@ -155,7 +155,7 @@ mod tests {
             .write_bytes_to_file(&bytes, download_file_path)
             .await;
         assert!(write_bytes_to_file_result.is_ok());
-        let delete_blob_result = aws_s3_bucket_connector.delete_blob(&key).await;
+        let delete_blob_result = aws_s3_bucket_connector.delete_blob(&blob_name).await;
         assert!(delete_blob_result.is_ok());
         Ok(())
     }
