@@ -2,8 +2,6 @@ extern crate connectors;
 extern crate parsers;
 extern crate data_access;
 extern crate models;
-use core::slice::SlicePattern;
-use std::io::Cursor;
 
 use log::info;
 use models::{schema::container_meta::date_time_created, model};
