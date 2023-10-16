@@ -1,10 +1,9 @@
 [package]
-name = "main"
+name = "web-framework-test-axum"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-services = { path = "lib/application/services" }
 axum = { version = "0.6.20", features = ["multipart"] }
 serde = { version = "1.0.189", features = ["derive"] }
 serde_json = "1.0"

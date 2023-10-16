@@ -207,8 +207,6 @@ impl MutimediaManagementService {
     /// returns a Result<(), Box<dyn std::error::Error>>
     pub async fn delete_blob_and_created_metadata_by_id(&self, delete_blob_parameters: &DeleteBlobParameters) -> Result<(), Box<dyn std::error::Error>> {
         let blob_name = delete_blob_parameters.get_blob_name();
-        info!("blob_name {} to be deleted", blob_name);
-        info!("blob folder {} to be deleted", delete_blob_parameters.container_meta_id);
         self.blob_storage_connector.as_ref().unwrap().delete_blob(&delete_blob_parameters.get_blob_name()).await?; // delete blob
         self.blob_storage_connector.as_ref().unwrap().delete_blob(&delete_blob_parameters.container_meta_id).await?; // delete folder
         let uuid_from_str = Uuid::parse_str(&delete_blob_parameters.container_meta_id).unwrap();

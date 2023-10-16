@@ -41,7 +41,7 @@ impl BlobController {
             upload_meta_parameters.description = String::from("A Sample MP4 container file");
             upload_meta_parameters.tags = vec![Some(String::from("nature")), Some(String::from("adventure"))];
             multi_media_management_service_unwrapped.upload_blob_from_bytes_and_create_metadata(
-                &(data.len() as u64),&data.as_ref(), &upload_file_parameters, &upload_meta_parameters);
+                &(data.len() as u64),&data.as_ref(), &upload_file_parameters, &upload_meta_parameters).await?;
 
             return Ok(Response::builder()
             .status(StatusCode::CREATED)

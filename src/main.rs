@@ -1,18 +1,33 @@
-use models::model::Model;
+use axum::{
+    routing::{get, post},
+    http::StatusCode,
+    response::IntoResponse,
+    Json, Router,
+};
+use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
 
-extern crate connectors;
-extern crate parsers;
-extern crate controllers;
-extern crate data_access;
-extern crate dtos;
-extern crate models;
-extern crate services;
+#[tokio::main]
+async fn main() {
+    // initialize tracing
+    tracing_subscriber::fmt::init();
 
-fn main() {
-    let container_meta = models::container_meta::ContainerMeta::new();
-    // controllers::hello();
-    // dtos::hello();
-    // services::hello();
-    // connectors::hello();
-    // data_access::hello();
+    // build our application with a route
+    let app = Router::new()
+        // `GET /` goes to `root`
+        .route("/", get(root));
+
+    // run our app with hyper
+    // `axum::Server` is a re-export of `hyper::Server`
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    tracing::debug!("listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+// basic handler that responds with a static string
+async fn root() -> &'static str {
+    "Hello, World!"
 }
