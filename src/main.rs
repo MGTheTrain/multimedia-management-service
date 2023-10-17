@@ -5,7 +5,7 @@
 use actix_multipart::{Multipart, form::{MultipartForm, tempfile::TempFile}};
 use actix_web::{HttpServer, web::{self, Bytes}, App, middleware, HttpResponse, post, Error, HttpResponseBuilder};
 
-use std::{fs::File, fmt};
+use std::{fs::{File, self}, fmt};
 use std::io::Read;
 
 #[derive(Debug, MultipartForm)]
@@ -14,25 +14,32 @@ struct UploadForm {
     files: Vec<TempFile>,
 }
 
-/// Upload a blob to a blob storage and insert metadata in SQL database table rows  
-///
-/// Requires an instance of `services::mutimedia_management_service::MutimediaManagementService`
 #[post("/api/v1/mms/upload")]
 async fn upload_blob(
-    form: MultipartForm<UploadForm>,
+    MultipartForm(form): MultipartForm<UploadForm>,
     multimedia_management_service: web::Data<services::mutimedia_management_service::MutimediaManagementService>,
 ) -> Result<HttpResponse, actix_web::Error> {
-    for f in &form.files {
-        let mut upload_file_parameters = services::upload_parameters::UploadFileParameters::new();
-        let file_name = f.file_name.clone().unwrap();
-        upload_file_parameters.file_name = file_name.clone();
-        let substrings: Vec<&str> = file_name.split('/').collect();
-
-        if let Some(last_element) = substrings.last() {
-            upload_file_parameters.blob_name = String::from(*last_element);
-        } else {
-            println!("No elements found.");
+    for f in form.files {
+        // create ./tmp required for file uploads
+        if let Err(err) = fs::create_dir_all("./tmp") {
+            log::error!("Failed to create directory: {}", err);
         }
+
+        let file_name = f.file_name.unwrap();
+        let mut current_dir_str = String::from("");
+        if let Ok(current_dir) = std::env::current_dir() {
+            current_dir_str = current_dir.to_string_lossy().to_string();
+        } 
+        let modified_current_dir_str = current_dir_str.replace("\\", "/");
+        let path = format!("{}/tmp/{}", modified_current_dir_str, file_name);
+        let path_clone = path.clone();
+        let path_clone_clone = path_clone.clone();
+        log::info!("saving to {}", &path);
+        f.file.persist(path).unwrap();
+
+        let mut upload_file_parameters = services::upload_parameters::UploadFileParameters::new();
+        upload_file_parameters.file_name = path_clone;
+        upload_file_parameters.blob_name = file_name.clone();
 
         // Some mock data
         let mut upload_meta_parameters = services::upload_parameters::UploadMetaParameters::new();
@@ -45,11 +52,19 @@ async fn upload_blob(
             .await;
 
         if let Err(err) = result {
+            if let Err(delete_error) = std::fs::remove_file(&path_clone_clone) {
+                log::error!("Failed to delete the temporary file: {}", delete_error);
+            }
             return Ok(HttpResponse::BadRequest().finish());
+        } else {
+            if let Err(delete_error) = std::fs::remove_file(&path_clone_clone) {
+                log::error!("Failed to delete the temporary file: {}", delete_error);
+            }
         }
     }
     Ok(HttpResponse::Ok().finish())
 }
+
 
 
 #[actix_web::main]
