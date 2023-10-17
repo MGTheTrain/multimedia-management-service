@@ -10,6 +10,7 @@ use bytes::Bytes;
 use log::info;
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct AzureBlobStorageAccountConnector {
     container_client: Option<ContainerClient>,
 }

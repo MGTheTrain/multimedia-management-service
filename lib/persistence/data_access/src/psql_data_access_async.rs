@@ -18,6 +18,7 @@ use uuid::Uuid;
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("../../domain/models/migrations");
 
+#[derive(Clone)]
 pub struct PsqlDataAccess {
     pub connection_pool: bb8::Pool<AsyncDieselConnectionManager<AsyncPgConnection>>,
 }

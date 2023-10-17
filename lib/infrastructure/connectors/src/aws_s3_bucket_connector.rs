@@ -20,6 +20,7 @@ use std::{
 use log::info;
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct AwsS3BucketConnector {
     bucket_name: Option<String>,
     storage_client: Option<Client>,
