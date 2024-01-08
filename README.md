@@ -23,7 +23,7 @@ The platform is exposing HTTP endpoints in which to
 
 ### Rust essentials
 
-0. Creating crates (Already considered here. So no actions required):
+#### Creating crates (Already considered here. So no actions required):
 
 ```rust
 # libs
@@ -38,7 +38,7 @@ cargo new lib/persistence/data_access --lib
 # For src/main.rs manually create the file and update the Cargo.toml to include internal and external crates
 ```
 
-1. Testing crates
+#### Testing crates
 
 ```rust
 # Navigate to the internal crate to test, e.g. domain models
@@ -46,7 +46,7 @@ cd lib/domain/models/
 cargo test
 ```
 
-2. Debugging
+#### Debugging
 
 ```rust
 # Set entrypoints in all the internal rust files of interest
