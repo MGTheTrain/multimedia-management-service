@@ -14,4 +14,4 @@ jobs:
         uses: MGTheTrain/public-github-actions/.github/actions/auto-formatting-for-rust@main
         with:
           WORKING_DIRECTORY: ./
-          GH_TOKEN: ${{ inputs.GH_TOKEN }} 
+          GH_TOKEN: ${{ inputs.GH_TOKEN }}
