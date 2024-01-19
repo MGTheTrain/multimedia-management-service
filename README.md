@@ -51,6 +51,6 @@ cargo test
 #### Debugging
 
 ```rust
-# Set breakpoint in all the internal rust files of interest
+# Set breakpoints in all the internal rust files of interest
 cargo run
 ```
