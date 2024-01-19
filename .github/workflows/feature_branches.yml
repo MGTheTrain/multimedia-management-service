@@ -1,0 +1,17 @@
+name: Auto-formatting Rust files
+
+on:
+  push:
+
+jobs:
+  set_stage:
+    name: Determine Stage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Auto-formatting Rust files
+        uses: MGTheTrain/public-github-actions/.github/actions/auto-formatting-for-rust@main
+        with:
+          WORKING_DIRECTORY: ./
+          GH_TOKEN: ${{ inputs.GH_TOKEN }}
