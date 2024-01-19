@@ -1,5 +1,7 @@
 # multimedia-management-service
 
+![Project Status](https://img.shields.io/badge/Status-On%20Hold-red)
+
 ## Table of Contents
 
 - [Summary](#summary)
