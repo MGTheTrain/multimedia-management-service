@@ -4,8 +4,8 @@ on:
   push:
 
 jobs:
-  set_stage:
-    name: Determine Stage
+  auto_formatting_and_linting:
+    name: Auto-formatting and linting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
