@@ -40,17 +40,10 @@ use models;
 pub struct Mp4Parser {} 
 
 impl Mp4Parser {
-    /// Method constructing a Mp4Parser object
-    /// 
-    /// Requires no paramters and returns a Mp4Parser object
     pub fn new() -> Self {
         Mp4Parser {}
     }
 
-    /// Method for retrieving MP4 file info and setting it in returned tuple
-    ///
-    /// Requires the &self and the filename as a parameter and returns a 
-    /// Result<(ContainerMeta, Option<VideoTrack>, Option<AudioTrack>, Option<SubtitleTrack>), Box<dyn std::error::Error>>
     pub fn parse_from_file(&self, filename: &str) -> 
     Result<(ContainerMeta, Option<VideoTrack>, Option<AudioTrack>, Option<SubtitleTrack>), Box<dyn std::error::Error>> {
         let f = File::open(filename)?;
@@ -111,10 +104,6 @@ impl Mp4Parser {
         Ok((container_meta, video_track, audio_track, subtitle_track))
     }
 
-    /// Helper method for the video section of the MP4 file if available
-    ///
-    /// Requires the &self and the track as a parameter and returns a 
-    /// Result<VideoTrack, Box<dyn std::error::Error>> object   
     fn get_video_info(&self, track: &Mp4Track) -> Result<VideoTrack, Box<dyn std::error::Error>> {
         let mut video_track = models::track::VideoTrack::new();
         video_track.media_type = track.media_type()?.to_string() as String;
@@ -137,10 +126,6 @@ impl Mp4Parser {
         Ok(video_track)
     }
     
-    /// Helper method for the audio section of the MP4 file if available
-    ///
-    /// Requires the &self and the track as a parameter and returns a 
-    /// Result<AudioTrack, Box<dyn std::error::Error>> object   
     fn get_audio_info(&self, track: &Mp4Track) -> Result<AudioTrack, Box<dyn std::error::Error>> {
         let mut audio_track = AudioTrack::new();
         audio_track.media_type = track.media_type()?.to_string() as String;        
@@ -176,10 +161,6 @@ impl Mp4Parser {
         Ok(audio_track)
     }
 
-    /// Helper method for the subtitle section of the MP4 file if available
-    /// 
-    /// Requires the &self and the track as a parameter and returns a 
-    /// Result<SubtitleTrack, Box<dyn std::error::Error>> object   
     fn get_subtitle_info(&self, track: &Mp4Track) -> Result<SubtitleTrack, Box<dyn std::error::Error>> {
         
         let mut subtitle_track = SubtitleTrack::new();

@@ -43,9 +43,6 @@ pub struct VideoTrack {
 }
 
 impl Model for VideoTrack {
-    /// Method constructing a VideoTrack object
-    /// 
-    /// Requires no paramters and returns a VideoTrack object
     fn new() -> Self {
         VideoTrack {
             id: Uuid::nil(),
@@ -74,9 +71,6 @@ pub struct AudioTrack {
 }
 
 impl Model for AudioTrack {
-    /// Method constructing a AudioTrack object
-    /// 
-    /// Requires no paramters and returns a AudioTrack object
     fn new() -> Self {
         AudioTrack {
             id: Uuid::nil(),
@@ -101,9 +95,6 @@ pub struct SubtitleTrack {
 }
 
 impl Model for SubtitleTrack {
-    /// Method constructing a SubtitleTrack object
-    /// 
-    /// Requires no paramters and returns a SubtitleTrack object
     fn new() -> Self {
         SubtitleTrack {
             id: Uuid::nil(),

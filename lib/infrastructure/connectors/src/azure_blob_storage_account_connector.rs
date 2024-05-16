@@ -39,10 +39,6 @@ pub struct AzureBlobStorageAccountConnector {
 }
 
 impl AzureBlobStorageAccountConnector {
-    /// Method new for constructing an object from the struct AzureBlobStorageAccountConnector
-    ///
-    /// This method takes no parameter,
-    /// and returns an AzureBlobStorageAccountConnector object
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {    
         let azure_access_key =
             std::env::var("AZURE_ACCESS_KEY").expect("AZURE_ACCESS_KEY environment variable expected");
@@ -59,10 +55,6 @@ impl AzureBlobStorageAccountConnector {
         })
     }
 
-    /// Private method for returning a blob client
-    ///
-    /// This method takes &self and the blob_name,
-    /// and returns an BlobClient object
     pub(crate) fn get_blob_client(&self, blob_name: &str) -> Option<BlobClient> {
         let blob_client = self
             .container_client
@@ -72,10 +64,6 @@ impl AzureBlobStorageAccountConnector {
         Some(blob_client)
     }
 
-    /// Async method for uploading blobs to an Azure Storage Account Container
-    ///
-    /// This method takes &self, the blob_name and a file_path as parameters,
-    /// and returns an Result<(), Error> object
     pub async fn upload_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
         let f = File::open(file_path)?;
@@ -87,20 +75,12 @@ impl AzureBlobStorageAccountConnector {
         Ok(())
     }
 
-    /// Async method for retrieving the content of a blob from an Azure Storage Account Container
-    ///
-    /// This method takes &self and the blob_name as parameters,
-    /// and returns an Result<Vec<u8>, Error> object
     pub async fn retrieve_bytes(&self, blob_name: &str) -> Result<Vec<u8>, Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
         let data = blob_client.get_content().await?;
         Ok(data)
     }
 
-    /// Async method for downloading blobs from an Azure Storage Account Container
-    ///
-    /// This method takes &self, the blob_name and a file_path as parameters,
-    /// and returns an Result<(), Error> object
     pub async fn download_blob(&self, blob_name: &str, file_path: &str) -> Result<(), Error> {
         let data = self.retrieve_bytes(blob_name).await?;
 
@@ -114,10 +94,6 @@ impl AzureBlobStorageAccountConnector {
         Ok(())
     }
 
-    /// Async method for deleting blobs from an Azure Storage Account Container
-    ///
-    /// This method takes &self and the blob_name as parameters,
-    /// and returns an Result<(), Error> object
     pub async fn delete_blob(&self, blob_name: &str) -> Result<(), Error> {
         let blob_client = self.get_blob_client(blob_name).unwrap();
         blob_client.delete().await?;

@@ -47,9 +47,6 @@ pub struct PsqlDataAccess {
 }
 
 impl PsqlDataAccess {
-    /// Method for creating the PsqlDataAccess constructor
-    ///
-    /// Requires no parameters and returns and PsqlDataAccess object
     pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
         let config = AsyncDieselConnectionManager::<AsyncPgConnection>::new(database_url);
@@ -68,9 +65,6 @@ impl PsqlDataAccess {
         })
     }
 
-    /// Method for inserting video_track rows into a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an video_track as parameters and returns a Result<models::track::VideoTrack, diesel::result::Error>
     pub async fn insert_video_track(
         &self,
         video_track: &models::track::VideoTrack,
@@ -90,9 +84,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for inserting audio_track rows into a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an audio_track as parameters and returns a Result<models::track::AudioTrack, diesel::result::Error>
     pub async fn insert_audio_track(
         &self,
         audio_track: &models::track::AudioTrack,
@@ -112,9 +103,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for inserting subtitle_track rows into a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an subtitle_track as parameters and returns a Result<models::track::SubtitleTrack, diesel::result::Error>
     pub async fn insert_subtitlte_track(
         &self,
         subtitle_track: &models::track::SubtitleTrack,
@@ -134,9 +122,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for inserting container_meta rows into a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an in_container_meta as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn insert_container_meta(
         &self,
         in_container_meta: &models::container_meta::ContainerMeta,
@@ -156,9 +141,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for retrieving a video_track row by id from a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an in_track_id as parameters and returns a Result<models::track::VideoTrack, diesel::result::Error>
     pub async fn get_video_track_by_id(
         &self,
         track_id: &Uuid,
@@ -177,9 +159,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for retrieving a audio_track row by id from a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an in_track_id as parameters and returns a Result<models::track::AudioTrack, diesel::result::Error>
     pub async fn get_audio_track_by_id(
         &self,
         track_id: &Uuid,
@@ -198,9 +177,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for retrieving a audio_track row by id from a Psql database table utilizing diesel ORM
-    ///
-    /// Requires an in_track_id as parameters and returns a Result<models::track::AudioTrack, diesel::result::Error>
     pub async fn get_subtitle_track_by_id(
         &self,
         track_id: &Uuid,
@@ -219,9 +195,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for retrieving a container_meta row by id from a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a pg_connection, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn get_container_meta_by_id(
         &self,
         container_meta_id: &Uuid,
@@ -240,9 +213,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for updating a video_track row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a track_id, an in_track_id as parameters and returns a Result<models::track::VideoTrack, diesel::result::Error>
     pub async fn update_video_track_by_id(
         &self,
         track_id: &Uuid,
@@ -270,9 +240,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for updating a audio_track row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a track_id, an in_track_id as parameters and returns a Result<models::track::AudioTrack, diesel::result::Error>
     pub async fn update_audio_track_by_id(
         &self,
         track_id: &Uuid,
@@ -299,9 +266,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for updating a subtitle_track row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a track_id, an in_track_id as parameters and returns a Result<models::track::SubtitleTrack, diesel::result::Error>
     pub async fn update_subtitle_track_by_id(
         &self,
         track_id: &Uuid,
@@ -325,9 +289,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for updating a container_meta row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn update_container_meta_by_id(
         &self,
         container_meta_id: &Uuid,
@@ -359,9 +320,6 @@ impl PsqlDataAccess {
         Ok(result)
     }
 
-    /// Method for deleting a video_track row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a track_id, an in_track_id as parameters and returns a Result<(), diesel::result::Error>
     pub async fn delete_video_track_by_id(
         &self,
         track_id: &Uuid,
@@ -376,9 +334,6 @@ impl PsqlDataAccess {
         Ok(())
     }
 
-    /// Method for deleting a audio_track row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a track_id, an in_track_id as parameters and returns a Result<(), diesel::result::Error>
     pub async fn delete_audio_track_by_id(
         &self,
         track_id: &Uuid,
@@ -393,9 +348,6 @@ impl PsqlDataAccess {
         Ok(())
     }
 
-    /// Method for deleting a subtitle_track row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a track_id, an in_track_id as parameters and returns a Result<(), diesel::result::Error>
     pub async fn delete_subtitle_track_by_id(
         &self,
         track_id: &Uuid,
@@ -410,9 +362,6 @@ impl PsqlDataAccess {
         Ok(())
     }
 
-    /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
-    ///
-    /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
     pub async fn delete_container_meta_by_id(
         &self,
         container_meta_id: &Uuid,

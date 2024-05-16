@@ -50,10 +50,6 @@ pub struct AwsS3BucketConnector {
 }
 
 impl AwsS3BucketConnector {
-    /// Method new for constructing an object from the struct AwsS3BucketConnector
-    ///
-    /// This method takes no parameters,
-    /// and returns an AwsS3BucketConnector object
     pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
         std::env::var("AWS_ACCESS_KEY_ID").expect("AWS_ACCESS_KEY_ID environment variable expected");
         std::env::var("AWS_SECRET_ACCESS_KEY").expect("AWS_SECRET_ACCESS_KEY environment variable expected");
@@ -69,10 +65,6 @@ impl AwsS3BucketConnector {
         })
     }
 
-    /// Private method for returning a blob client
-    ///
-    /// This method takes &self, the blob_name and a blob_name as parameters,
-    /// and returns an Result<GetObjectOutput, SdkError<GetObjectError>> object
     pub async fn get_object(
         &self,
         blob_name: &str,
@@ -87,10 +79,6 @@ impl AwsS3BucketConnector {
             .await
     }
 
-    /// Async method for uploading blobs to an AWS S3 Bucket
-    ///
-    /// This method takes &self, the blob_name and the file_name  as parameters,
-    /// and returns an Result<PutObjectOutput, SdkError<PutObjectError>> object
     pub async fn upload_blob(
         &self,
         blob_name: &str,
@@ -111,10 +99,6 @@ impl AwsS3BucketConnector {
         put_object_output
     }
 
-    /// Async method for uploading blobs to an AWS S3 Bucket
-    ///
-    /// This method takes &self, the blob_name and the bytes as parameters,
-    /// and returns an Result<PutObjectOutput, SdkError<PutObjectError>> object
     pub async fn upload_bytes(
         &self,
         blob_name: &str,
@@ -135,10 +119,6 @@ impl AwsS3BucketConnector {
         put_object_output
     }
 
-    /// Async method for writing the blobs content/bytes from an AWS S3 Bucket to a file
-    ///
-    /// This method takes &self, the bytes and a file_path as parameters,
-    /// and returns a Result<(), io::Error> object
     pub async fn write_bytes_to_file(&self, bytes: &Bytes, file_path: &str) -> Result<(), io::Error> {
         let mut file = fs::OpenOptions::new()
             .create(true) // To create a new file
@@ -150,10 +130,6 @@ impl AwsS3BucketConnector {
         Ok(())
     }
 
-    /// Async method for deleting blobs from an AWS S3 Bucket
-    ///
-    /// This method takes &self and the blob_name as parameters,
-    /// and returns an Result<(), Error> object
     pub async fn delete_blob(&self, blob_name: &str) -> Result<(), Error> {
         self.storage_client
             .as_ref()

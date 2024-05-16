@@ -50,9 +50,6 @@ pub struct ContainerMeta {
 }
 
 impl Model for ContainerMeta {
-    /// Method constructing a ContainerMeta object
-    /// 
-    /// Requires no paramters and returns a ContainerMeta object
     fn new() -> Self {
         ContainerMeta {
             id: Uuid::nil(),

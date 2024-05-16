@@ -45,9 +45,6 @@
 // }
 
 // impl PsqlDataAccess {
-//     /// Method for creating the PsqlDataAccess constructor
-//     ///
-//     /// Requires no parameters and returns and PsqlDataAccess object
 //     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
 //         let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not found in .cfg");
 //         let manager = ConnectionManager::<PgConnection>::new(database_url);
@@ -63,10 +60,6 @@
 //         })
 //     }
 
-//     /// Method for inserting track rows into a Psql database table utilizing diesel ORM
-//     /// NOTE: Support for diesel_async is in the working (See: https://docs.rs/diesel-async/latest/diesel_async/)
-//     ///
-//     /// Requires an in_track as parameters and returns a Result<models::track::Track, diesel::result::Error>
 //     pub fn insert_track(
 //         &self,
 //         in_track: &models::track::Track,
@@ -87,9 +80,6 @@
 //         Ok(result)
 //     }
 
-//     /// Method for inserting container_meta rows into a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires an in_container_meta as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
 //     pub fn insert_container_meta(
 //         &self,
 //         in_container_meta: &models::container_meta::ContainerMeta,
@@ -111,9 +101,6 @@
 //         Ok(result)
 //     }
 
-//     /// Method for retrieving a track row by id from a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires an in_track_id as parameters and returns a Result<models::track::Track, diesel::result::Error>
 //     pub fn get_track_by_id(
 //         &self,
 //         track_id: &Uuid,
@@ -133,9 +120,6 @@
 //         Ok(result)
 //     }
 
-//     /// Method for retrieving a container_meta row by id from a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
 //     pub fn get_container_meta_by_id(
 //         &self,
 //         container_meta_id: &Uuid,
@@ -155,9 +139,6 @@
 //         Ok(result)
 //     }
 
-//     /// Method for updating a track row by id in a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires a track_id, an in_track_id as parameters and returns a Result<models::track::Track, diesel::result::Error>
 //     pub fn update_track_by_id(
 //         &self,
 //         track_id: &Uuid,
@@ -182,9 +163,6 @@
 //         Ok(result)
 //     }
 
-//     /// Method for updating a container_meta row by id in a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
 //     pub fn update_container_meta_by_id(
 //         &self,
 //         container_meta_id: &Uuid,
@@ -213,9 +191,6 @@
 //         Ok(result)
 //     }
 
-//     /// Method for deleting a track row by id in a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires a track_id, an in_track_id as parameters and returns a Result<models::track::Track, diesel::result::Error>
 //     pub fn delete_track_by_id(
 //         &self,
 //         track_id: &Uuid,
@@ -231,9 +206,6 @@
 //         Ok(())
 //     }
 
-//     /// Method for deleting a container_meta row by id in a Psql database table utilizing diesel ORM
-//     ///
-//     /// Requires a container_meta_id, an in_container_meta_id as parameters and returns a Result<models::container_meta::ContainerMeta, diesel::result::Error>
 //     pub     fn delete_container_meta_by_id(
 //         &self,
 //         container_meta_id: &Uuid,

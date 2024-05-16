@@ -11,18 +11,12 @@ struct BlobController {
 }
 
 impl BlobController {
-    /// Method for creating the BlobController constructor
-    ///
-    /// Requires no parameters and returns and BlobController object
     pub async fn new() -> Result<Self, Box<dyn std::error::Error>> {
         Ok(BlobController {
             multi_media_management_service: Some(services::mutimedia_management_service::MutimediaManagementService::new().await),
         })
     }
 
-    /// Method handle for uploading multipart files to a blob storage
-    /// 
-    ///  Requires &self and multipart as parameters and returns Result<Response, StatusCode>
     async fn upload(&self, mut multipart: Multipart) -> Result<Response, StatusCode> {
         while let Some(mut field) = multipart.next_field().await.unwrap() {
             let name = field.name().unwrap().to_string();

@@ -42,9 +42,6 @@ pub struct MutimediaManagementService {
 }
 
 impl MutimediaManagementService {
-    /// Method for creating the MutimediaManagementService constructor
-    ///
-    /// Requires no parameters and returns and MutimediaManagementService object
     pub async fn new() -> Self {
         MutimediaManagementService {
             blob_storage_connector: Some(connectors::aws_s3_bucket_connector::AwsS3BucketConnector::new().await.unwrap()),
@@ -53,10 +50,6 @@ impl MutimediaManagementService {
         }
     }
 
-    /// Method for uploading blobs from a file (which then will be converted to a bytestream) to a blob storage and 
-    /// inserting metadata to relational database table rows
-    ///
-    /// Requires upload_file_parameters, upload_meta_parameters and returns a Result<models::container_meta::ContainerMeta, Box<dyn std::error::Error>>
     pub async fn upload_blob_from_file_and_create_metadata(        
         &self,
         upload_file_parameters: &upload_parameters::UploadFileParameters,
@@ -127,10 +120,6 @@ impl MutimediaManagementService {
         Ok(container_meta)
     }
 
-    /// Method for retrieving bytes from blobs in a blob storage required for downloading 
-    ///
-    /// Requires the &self and download_blob_parameters as parameters and 
-    /// returns a Result<Bytes, Box<dyn std::error::Error>>
     pub async fn retrieve_bytes_from_blob_by_name(&self, download_blob_parameters: &download_parameters::DownloadBlobParameters) 
         -> Result<Bytes, Box<dyn std::error::Error>> {
         let get_object_output = 
@@ -145,11 +134,6 @@ impl MutimediaManagementService {
         Ok(bytes)
     }    
 
-    /// Method for deleting blobs from a blob storage and 
-    /// deleting metadata inserted into relational database table rows by id
-    /// 
-    /// Requires the &self, delete_blob_parameters and file_name as parameters and 
-    /// returns a Result<(), Box<dyn std::error::Error>>
     pub async fn delete_blob_and_created_metadata_by_id(&self, delete_blob_parameters: &DeleteBlobParameters) -> Result<(), Box<dyn std::error::Error>> {
         let blob_name = delete_blob_parameters.get_blob_name();
         self.blob_storage_connector.as_ref().unwrap().delete_blob(&delete_blob_parameters.get_blob_name()).await?; // delete blob
@@ -174,10 +158,7 @@ impl MutimediaManagementService {
         Ok(())
     }
 
-    // /// [TOO COMPLEX] Method for updating metadata inserted into relational database table rows by id
-    // /// 
-    // /// Requires the &self, id and model_type as parameters and 
-    // /// returns a Result<Option<models::ModelType>, Box<dyn std::error::Error>>
+    // /// [Too complex] method for updating metadata
     // pub async fn update_metadata_by_id(&self, id: &Uuid, model_type: &models::ModelType) -> Result<Option<models::ModelType>, Box<dyn std::error::Error>>
     // {
     //     match model_type {
@@ -221,10 +202,6 @@ impl MutimediaManagementService {
     //     }
     // }
 
-    /// Method for retrieving metadata inserted into relational database table rows by id
-    /// 
-    /// Requires the &self, id and file_name as parameters and 
-    /// returns a Result<Option<models::ModelType>, Box<dyn std::error::Error>>
     pub async fn retrieve_metadata_by_id<T>(&self, id: &Uuid) -> Result<Option<models::ModelType>, Box<dyn std::error::Error>>
     where
         T: models::model::Model,
