@@ -35,4 +35,4 @@ cargo test
 
 #### Debugging
 
-Setup in VS Code a [launch.json](.vscode\launch.json). Set breakpoints in all the internal rust files of interest and start debugging.
+Setup in VS Code a [launch.json](.vscode/launch.json). Set breakpoints in all the internal rust files of interest and start debugging.
