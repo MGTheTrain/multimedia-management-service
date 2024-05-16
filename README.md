@@ -1,6 +1,8 @@
 # multimedia-management-service
 
-![Project Status](https://img.shields.io/badge/Status-On%20Hold-red)
+![Project Status: Archived](https://img.shields.io/badge/Project_Status-Archived-lightgrey.svg)
+
+**Superseeded by https://github.com/MGTheTrain/multi-media-management-service**
 
 ## Table of Contents
 
