@@ -2,8 +2,6 @@
 
 ![Project Status: Aborted](https://img.shields.io/badge/Project_Status-Aborted-lightgrey.svg)
 
-**Superseeded by https://github.com/MGTheTrain/multi-media-management-service**
-
 ## Table of Contents
 
 - [Summary](#summary)
