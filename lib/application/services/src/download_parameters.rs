@@ -19,12 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
-// Maintainers:
-// - MGTheTrain 
-// 
-// Contributors:
-// - TBD
+
 
 pub struct DownloadBlobParameters {
     pub container_meta_id: String,

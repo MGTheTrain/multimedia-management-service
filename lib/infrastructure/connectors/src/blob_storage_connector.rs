@@ -19,12 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
-// Maintainers:
-// - MGTheTrain 
-// 
-// Contributors:
-// - TBD
+
 
 // // NOTE: async traits not supported for now. See: https://stackoverflow.com/questions/65921581/how-can-i-define-an-async-method-in-a-trait
 // use std::error::Error;
